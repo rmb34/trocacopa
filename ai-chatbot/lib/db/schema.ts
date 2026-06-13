@@ -79,3 +79,16 @@ export const stickerEntry = pgTable('sticker_entry', {
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
+
+// One purchase record per user (unique userId). Tracks Stripe checkout status.
+export const purchase = pgTable('purchase', {
+  id: serial('id').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  stripeSessionId: text('stripeSessionId'),
+  paidAt: timestamp('paidAt'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+})
