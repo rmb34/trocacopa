@@ -26,8 +26,9 @@ export function TradesUpsell({ repeatCount }: { repeatCount: number }) {
         )}
 
         <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-          As trocas existem graças a quem apoia o projeto. Vire <strong>Apoiador</strong> por
-          R$&nbsp;10,99 (uma vez, pra sempre) e libere sua lista de repetidas para combinar trocas.
+          As trocas existem graças a quem apoia o projeto. Vire{' '}
+          <strong>Apoiador</strong> por R$&nbsp;10,99 (uma vez, pra sempre) e libere sua lista de
+          repetidas para combinar trocas.
         </p>
 
         <Link

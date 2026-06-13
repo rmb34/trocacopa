@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getOrCreateProfile } from '@/app/actions/profile'
-import { getPurchaseStatus } from '@/app/actions/purchase'
+import { getPurchaseStatus } from '@/lib/db/queries'
 import { isSupporter } from '@/lib/entitlements'
 import { AppHeader } from '@/components/app-header'
 

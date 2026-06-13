@@ -1,8 +1,8 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { stickerEntry, profile } from '@/lib/db/schema'
-import { and, eq, inArray } from 'drizzle-orm'
+import { stickerEntry } from '@/lib/db/schema'
+import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { allStickerCodes } from '@/lib/catalog'
 import { toEntryMap, type EntryMap } from '@/lib/stats'
@@ -12,14 +12,6 @@ const VALID_CODES = new Set(allStickerCodes())
 
 export async function getMyEntries(): Promise<EntryMap> {
   const userId = await getUserId()
-  const rows = await db
-    .select({ stickerCode: stickerEntry.stickerCode, count: stickerEntry.count })
-    .from(stickerEntry)
-    .where(eq(stickerEntry.userId, userId))
-  return toEntryMap(rows)
-}
-
-export async function getEntriesByUserId(userId: string): Promise<EntryMap> {
   const rows = await db
     .select({ stickerCode: stickerEntry.stickerCode, count: stickerEntry.count })
     .from(stickerEntry)
@@ -92,35 +84,4 @@ export async function setManyCounts(updates: { stickerCode: string; count: numbe
   revalidatePath('/album')
   revalidatePath('/dashboard')
   revalidatePath('/repetidas')
-}
-
-// All public collectors (other than the current user) with their entries,
-// used to compute swap matches.
-export async function getOtherCollectors(currentUserId: string) {
-  const profiles = await db
-    .select()
-    .from(profile)
-    .where(eq(profile.isPublic, true))
-
-  const others = profiles.filter((p) => p.userId !== currentUserId)
-  if (others.length === 0) return []
-
-  const userIds = others.map((p) => p.userId)
-  const rows = await db
-    .select({
-      userId: stickerEntry.userId,
-      stickerCode: stickerEntry.stickerCode,
-      count: stickerEntry.count,
-    })
-    .from(stickerEntry)
-    .where(inArray(stickerEntry.userId, userIds))
-
-  const byUser: Record<string, EntryMap> = {}
-  for (const id of userIds) byUser[id] = {}
-  for (const row of rows) {
-    byUser[row.userId] = byUser[row.userId] || {}
-    byUser[row.userId][row.stickerCode] = row.count
-  }
-
-  return others.map((p) => ({ profile: p, entries: byUser[p.userId] ?? {} }))
 }
