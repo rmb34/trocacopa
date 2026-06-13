@@ -21,7 +21,10 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
   const [, startTransition] = useTransition()
 
   const stats = useMemo(() => computeStats(entries), [entries])
-  const teamsInGroup = useMemo(() => TEAMS.filter((t) => t.group === group), [group])
+  const teamsInGroup = useMemo(
+    () => (group === 'Todas' ? TEAMS : TEAMS.filter((t) => t.group === group)),
+    [group],
+  )
 
   function countFor(code: string) {
     return entries[code] ?? 0
@@ -128,6 +131,13 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
 
       {/* Group tabs */}
       <div className="flex flex-wrap gap-2">
+        <Button
+          variant={group === 'Todas' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setGroup('Todas')}
+        >
+          Todas
+        </Button>
         {GROUPS.map((g) => (
           <Button
             key={g}
@@ -135,7 +145,7 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
             size="sm"
             onClick={() => setGroup(g)}
           >
-            Grupo {g}
+            {g === 'Especial' ? 'Especial' : `Grupo ${g}`}
           </Button>
         ))}
       </div>
