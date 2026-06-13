@@ -63,7 +63,7 @@ export const profile = pgTable('profile', {
   slug: text('slug').notNull().unique(),
   city: text('city'),
   whatsapp: text('whatsapp'),
-  isPublic: boolean('isPublic').notNull().default(true),
+  isPublic: boolean('isPublic').notNull().default(false),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
