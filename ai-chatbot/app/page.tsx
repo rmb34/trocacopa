@@ -33,13 +33,20 @@ export const metadata: Metadata = {
     title: 'TrocaCopa — Álbum de figurinhas da Copa 2026 no celular',
     description:
       'Marque o que tem, veja o que falta e controle suas repetidas. Acesso vitalício por R$ 10,99, pagamento único.',
-    images: [{ url: '/icon-512.png', width: 512, height: 512, alt: 'TrocaCopa' }],
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'TrocaCopa — álbum da Copa 2026 por R$ 10,99',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TrocaCopa — Álbum da Copa 2026 no celular',
     description: 'Controle figurinhas, repetidas e trocas. R$ 10,99, pagamento único.',
-    images: ['/icon-512.png'],
+    images: ['/og.png'],
   },
   robots: { index: true, follow: true },
 }
