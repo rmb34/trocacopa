@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   description:
     'Gerencie seu álbum de figurinhas da Copa do Mundo, descubra suas repetidas e encontre colecionadores para trocar perto de você.',
   generator: 'v0.app',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+  },
   icons: {
     icon: [
       {
