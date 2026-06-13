@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/logo'
 import { ShareButton } from '@/components/share-button'
+import { TeamFlag } from '@/components/team-flag'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -109,7 +110,7 @@ export default async function PublicProfilePage({ params }: Props) {
                   <Card key={team.code}>
                     <CardContent className="p-3">
                       <div className="mb-1.5 flex items-center gap-1.5">
-                        <span aria-hidden className="text-base">{team.flag}</span>
+                        <TeamFlag team={team} size="sm" />
                         <span className="text-sm font-medium text-foreground">{team.name}</span>
                       </div>
                       <p className="font-mono text-xs text-muted-foreground">
@@ -134,7 +135,7 @@ export default async function PublicProfilePage({ params }: Props) {
                   <Card key={team.code}>
                     <CardContent className="p-3">
                       <div className="mb-1.5 flex items-center gap-1.5">
-                        <span aria-hidden className="text-base">{team.flag}</span>
+                        <TeamFlag team={team} size="sm" />
                         <span className="text-sm font-medium text-foreground">{team.name}</span>
                       </div>
                       <p className="font-mono text-xs text-muted-foreground">

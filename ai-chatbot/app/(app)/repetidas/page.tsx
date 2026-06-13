@@ -5,6 +5,7 @@ import { TEAMS } from '@/lib/catalog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ShareButton } from '@/components/share-button'
+import { TeamFlag } from '@/components/team-flag'
 
 export default async function ReptidasPage() {
   const profile = await getOrCreateProfile()
@@ -64,7 +65,7 @@ export default async function ReptidasPage() {
             <Card key={team.code}>
               <CardHeader className="pb-2 pt-4">
                 <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <span aria-hidden>{team.flag}</span>
+                  <TeamFlag team={team} size="sm" />
                   {team.name}
                   <Badge variant="secondary" className="ml-auto">
                     {extras.length}
