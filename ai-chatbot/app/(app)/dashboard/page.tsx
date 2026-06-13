@@ -6,7 +6,8 @@ import { computeStats, computeTeamProgress } from '@/lib/stats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Copy, ArrowLeftRight, CheckCircle2, CircleDashed, Layers } from 'lucide-react'
+import { BookOpen, Copy, CheckCircle2, CircleDashed, Layers } from 'lucide-react'
+import { TeamFlag } from '@/components/team-flag'
 
 export default async function DashboardPage() {
   const profile = await getOrCreateProfile()
@@ -25,21 +26,21 @@ export default async function DashboardPage() {
       value: stats.owned,
       sub: `de ${stats.total}`,
       icon: CheckCircle2,
-      tone: 'text-primary',
+      tone: 'text-success',
     },
     {
       label: 'Faltando',
       value: stats.missing,
       sub: 'para completar',
       icon: CircleDashed,
-      tone: 'text-foreground',
+      tone: 'text-info',
     },
     {
       label: 'Repetidas',
       value: stats.duplicates,
       sub: 'prontas p/ trocar',
       icon: Layers,
-      tone: 'text-accent-foreground',
+      tone: 'text-warn',
     },
   ]
 
@@ -53,11 +54,10 @@ export default async function DashboardPage() {
             Seu painel
           </h1>
         </div>
-        <Button asChild size="sm" className="shrink-0 gap-2">
+        <Button asChild size="lg" className="h-auto shrink-0 gap-2 px-4 py-2.5">
           <Link href="/album">
             <BookOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Abrir álbum</span>
-            <span className="sm:hidden">Álbum</span>
+            Álbum
           </Link>
         </Button>
       </div>
@@ -103,39 +103,22 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Quick actions */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Link href="/repetidas">
-          <Card className="h-full transition-colors hover:border-primary/50">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
-                <Copy className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Minhas repetidas</p>
-                <p className="text-sm text-muted-foreground">
-                  Organize o que sobra para trocar
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/trocas">
-          <Card className="h-full transition-colors hover:border-primary/50">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
-                <ArrowLeftRight className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Encontrar trocas</p>
-                <p className="text-sm text-muted-foreground">
-                  Colecionadores que combinam com você
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
+      {/* Quick action */}
+      <Link href="/repetidas">
+        <Card className="transition-colors hover:border-primary/50">
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
+              <Copy className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">Minhas repetidas</p>
+              <p className="text-sm text-muted-foreground">
+                Veja o que sobra e compartilhe para trocar
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
 
       {/* Team progress */}
       <Card>
@@ -152,10 +135,8 @@ export default async function DashboardPage() {
           {topTeams.map((t) => (
             <div key={t.code} className="flex flex-col gap-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-foreground">
-                  <span aria-hidden className="mr-1">
-                    {t.flag}
-                  </span>
+                <span className="flex items-center gap-1.5 font-medium text-foreground">
+                  <TeamFlag team={t} size="sm" />
                   {t.name}
                 </span>
                 <span className="text-muted-foreground">
