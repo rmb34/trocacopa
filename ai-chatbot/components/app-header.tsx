@@ -130,8 +130,8 @@ export function AppHeader({
       </header>
 
       {/* Bottom nav — mobile only */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur md:hidden">
-        <div className="flex items-center justify-around px-2 py-1">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background md:hidden">
+        <div className="flex items-stretch justify-around">
           {NAV.map((item) => {
             const active = isActive(item.href)
             return (
@@ -139,12 +139,15 @@ export function AppHeader({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-lg px-3 py-1 transition-colors',
+                  'relative flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors',
                   active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                <item.icon className={cn('h-5 w-5', active && 'text-primary')} />
-                <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                {active && (
+                  <span className="absolute top-0 left-1/4 right-1/4 h-0.5 rounded-b-full bg-primary" />
+                )}
+                <item.icon className="h-5 w-5" />
+                <span className="text-[10px] font-semibold leading-none tracking-tight">{item.label}</span>
               </Link>
             )
           })}

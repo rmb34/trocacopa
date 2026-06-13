@@ -46,38 +46,39 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Heading */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">Olá, {firstName}</p>
+          <p className="text-sm font-medium text-muted-foreground">Olá, {firstName} 👋</p>
           <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground">
             Seu painel
           </h1>
         </div>
-        <Button asChild>
-          <Link href="/album" className="gap-2">
+        <Button asChild size="sm" className="shrink-0 gap-2">
+          <Link href="/album">
             <BookOpen className="h-4 w-4" />
-            Abrir álbum
+            <span className="hidden sm:inline">Abrir álbum</span>
+            <span className="sm:hidden">Álbum</span>
           </Link>
         </Button>
       </div>
 
       {/* Completion hero */}
-      <Card className="overflow-hidden">
-        <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center">
-          <div className="flex flex-1 flex-col gap-3">
-            <div className="flex items-baseline gap-2">
-              <span className="font-heading text-5xl font-black text-primary">
-                {stats.percent}%
-              </span>
-              <span className="text-sm text-muted-foreground">do álbum completo</span>
-            </div>
-            <Progress value={stats.percent} className="h-3" />
-            <p className="text-sm text-muted-foreground">
-              {stats.owned} de {stats.total} figurinhas coladas. Faltam{' '}
-              <span className="font-semibold text-foreground">{stats.missing}</span> para
-              fechar a coleção.
-            </p>
+      <Card className="overflow-hidden border-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
+        <CardContent className="flex flex-col gap-4 p-6">
+          <div className="flex items-baseline gap-2">
+            <span className="font-heading text-6xl font-black leading-none">
+              {stats.percent}%
+            </span>
+            <span className="text-primary-foreground/70 text-sm">completo</span>
           </div>
+          <Progress
+            value={stats.percent}
+            className="h-2.5 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
+          />
+          <p className="text-sm text-primary-foreground/80">
+            {stats.owned} de {stats.total} figurinhas ·{' '}
+            <span className="font-semibold text-primary-foreground">{stats.missing}</span> faltando
+          </p>
         </CardContent>
       </Card>
 
