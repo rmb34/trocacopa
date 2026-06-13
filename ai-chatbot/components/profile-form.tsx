@@ -107,7 +107,7 @@ export function ProfileForm({ profile }: { profile: ProfileData }) {
                 inputMode="numeric"
               />
               <p className="text-xs text-muted-foreground">
-                Só números com DDD. Outros colecionadores verão para combinar trocas.
+                Só números com DDD. Guardado em privado — não aparece no seu perfil público.
               </p>
             </div>
 

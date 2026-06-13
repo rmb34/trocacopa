@@ -89,6 +89,17 @@ export async function updateProfile(input: {
 }
 
 export async function getProfileBySlug(slug: string) {
-  const rows = await db.select().from(profile).where(eq(profile.slug, slug)).limit(1)
+  // Explicit select — never expose `whatsapp` on the public payload.
+  const rows = await db
+    .select({
+      userId: profile.userId,
+      displayName: profile.displayName,
+      slug: profile.slug,
+      city: profile.city,
+      isPublic: profile.isPublic,
+    })
+    .from(profile)
+    .where(eq(profile.slug, slug))
+    .limit(1)
   return rows[0] ?? null
 }
