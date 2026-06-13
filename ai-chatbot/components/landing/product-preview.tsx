@@ -12,7 +12,7 @@ export function ProductPreview() {
   return (
     <div className="relative">
       {/* Copa accent stripe */}
-      <div className="absolute -top-3 left-6 right-6 h-1.5 rounded-full bg-gradient-to-r from-primary via-info to-success" />
+      <div className="absolute -top-3 left-6 right-6 h-1.5 rounded-full bg-gradient-to-r from-success via-warn to-info" />
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
         {/* Faux app bar */}
