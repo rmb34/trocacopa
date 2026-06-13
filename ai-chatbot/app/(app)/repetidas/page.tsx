@@ -1,17 +1,41 @@
 import { redirect } from 'next/navigation'
 import { getOrCreateProfile } from '@/app/actions/profile'
+import { getPurchaseStatus } from '@/app/actions/purchase'
 import { getMyEntries } from '@/app/actions/stickers'
+import { canAccessTrades } from '@/lib/entitlements'
+import { duplicateCodes } from '@/lib/stats'
 import { TEAMS } from '@/lib/catalog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ShareButton } from '@/components/share-button'
+import { TradesUpsell } from '@/components/trades-upsell'
 import { TeamFlag } from '@/components/team-flag'
 
 export default async function ReptidasPage() {
   const profile = await getOrCreateProfile()
   if (!profile) redirect('/sign-in')
 
+  const status = await getPurchaseStatus(profile.userId)
   const entries = await getMyEntries()
+
+  // Free tier: show the repeat COUNT (value before the wall) but never the
+  // list itself. The full inventory is computed only for supporters below.
+  if (!canAccessTrades(status)) {
+    const repeatCount = duplicateCodes(entries).length
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <h1 className="font-heading text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+            Minhas repetidas
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Organize e compartilhe suas figurinhas para troca.
+          </p>
+        </div>
+        <TradesUpsell repeatCount={repeatCount} />
+      </div>
+    )
+  }
 
   const teamDuplicates = TEAMS.map((team) => {
     const extras: { n: number; extra: number }[] = []

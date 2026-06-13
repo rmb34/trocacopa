@@ -74,20 +74,27 @@ const FEATURES = [
   },
 ]
 
-const INCLUDED = [
-  `${TOTAL_STICKERS} figurinhas — 48 seleções × 20 + FWC + Coca-Cola`,
-  'Controle de repetidas com contador por figurinha',
-  'Perfil público compartilhável por link',
+const FREE_INCLUDED = [
+  `Rastrear as ${TOTAL_STICKERS} figurinhas — tem / falta`,
+  'Progresso por seleção e total',
+  'Link público "Procuro" para divulgar',
   'Instalável no celular (PWA)',
-  'Acesso vitalício — sem mensalidade, sem renovação',
+]
+
+const SUPPORTER_INCLUDED = [
+  'Tudo do plano grátis',
+  'Lista de repetidas organizada para trocar',
+  'Inventário "tenho para troca" no perfil público',
+  'Selo ⭐ Apoiador no seu perfil',
+  'Acesso vitalício — uma vez, sem mensalidade',
 ]
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: 'TrocaCopa — Acesso Completo',
+  name: 'TrocaCopa — Apoiador',
   description:
-    'Álbum digital de figurinhas da Copa do Mundo 2026. Controle de figurinhas, repetidas e trocas. Acesso vitalício.',
+    'Álbum digital de figurinhas da Copa do Mundo 2026. Grátis para rastrear; Apoiador (R$ 10,99) libera as trocas. Acesso vitalício.',
   brand: { '@type': 'Brand', name: 'TrocaCopa' },
   offers: {
     '@type': 'Offer',
@@ -117,7 +124,7 @@ export default async function LandingPage() {
       />
 
       {/* Copa accent bar */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-primary via-info to-success" />
+      <div className="h-1.5 w-full bg-gradient-to-r from-success via-warn to-info" />
 
       {/* Nav */}
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
@@ -162,19 +169,18 @@ export default async function LandingPage() {
             </h1>
 
             <p className="mx-auto mt-5 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground md:mx-0">
-              Marque o que você tem, veja o que falta e controle suas repetidas.
-              Tudo no celular, sem papel nem planilha.
+              Comece <strong className="text-foreground">grátis</strong>: marque o que tem, veja o
+              que falta e acompanhe seu progresso. Sem papel nem planilha.
             </p>
 
-            {/* Price highlight */}
+            {/* Free + supporter highlight */}
             <div className="mt-7 flex items-center justify-center gap-3 md:justify-start">
-              <div className="flex items-baseline gap-1 rounded-xl bg-foreground px-4 py-2 text-background">
-                <span className="text-sm font-semibold">R$</span>
-                <span className="font-heading text-3xl font-black leading-none">{PRICE}</span>
+              <div className="flex items-baseline gap-1 rounded-xl bg-success px-4 py-2 text-success-foreground">
+                <span className="font-heading text-2xl font-black leading-none">Grátis</span>
               </div>
               <div className="text-left text-sm leading-tight text-muted-foreground">
-                <span className="block font-semibold text-foreground">Pagamento único</span>
-                acesso vitalício, sem mensalidade
+                <span className="block font-semibold text-foreground">para começar</span>
+                vire Apoiador (R$&nbsp;{PRICE}) e libere as trocas
               </div>
             </div>
 
@@ -195,7 +201,7 @@ export default async function LandingPage() {
             </div>
 
             <p className="mt-4 text-xs text-muted-foreground">
-              Cartão de crédito · Acesso imediato após o pagamento
+              Grátis para começar · sem cartão · Apoiador é pagamento único
             </p>
           </div>
 
@@ -210,8 +216,11 @@ export default async function LandingPage() {
       <section className="border-t border-border bg-secondary/40">
         <div className="mx-auto max-w-5xl px-4 py-16">
           <h2 className="text-center font-heading text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
-            O que você leva por R$&nbsp;{PRICE}
+            Tudo para completar seu álbum
           </h2>
+          <p className="mx-auto mt-2 max-w-md text-center text-sm text-muted-foreground">
+            O rastreamento é grátis. As trocas se desbloqueiam quando você vira Apoiador.
+          </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <div key={f.title} className="rounded-xl border border-border bg-card p-5 shadow-sm">
@@ -226,43 +235,65 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Price section */}
+      {/* Pricing — two tiers */}
       <section className="mx-auto max-w-5xl px-4 py-16">
-        <div className="mx-auto max-w-sm rounded-2xl border border-border bg-card p-8 shadow-md">
-          {/* accent stripe */}
-          <div className="mx-auto mb-6 h-1.5 w-16 rounded-full bg-gradient-to-r from-primary via-info to-success" />
-          <p className="text-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Acesso completo
-          </p>
-          <p className="mt-2 text-center font-heading text-6xl font-black text-foreground">
-            R$<span className="text-5xl">10</span>
-            <span className="text-3xl">,99</span>
-          </p>
-          <p className="mt-1 text-center text-sm text-muted-foreground">
-            Pagamento único · Sem renovação
-          </p>
+        <h2 className="text-center font-heading text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
+          Comece grátis. Apoie quando quiser.
+        </h2>
+        <div className="mx-auto mt-10 grid max-w-3xl gap-6 sm:grid-cols-2">
+          {/* Colecionador */}
+          <div className="flex flex-col rounded-2xl border border-border bg-card p-7 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Colecionador
+            </p>
+            <p className="mt-2 font-heading text-4xl font-black text-foreground">Grátis</p>
+            <p className="mt-1 text-sm text-muted-foreground">Para sempre</p>
+            <ul className="mt-6 flex flex-1 flex-col gap-3">
+              {FREE_INCLUDED.map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/sign-up"
+              className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg border border-border px-6 py-3 text-base font-semibold text-foreground transition-colors hover:bg-secondary"
+            >
+              Começar grátis
+            </Link>
+          </div>
 
-          <ul className="mt-6 flex flex-col gap-3">
-            {INCLUDED.map((item) => (
-              <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
-                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            href="/sign-up"
-            className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Criar conta e começar
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            Cartão de crédito · Pagamento seguro via Stripe
-          </p>
+          {/* Apoiador */}
+          <div className="relative flex flex-col rounded-2xl border-2 border-primary bg-card p-7 shadow-md">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-0.5 text-xs font-bold text-accent-foreground">
+              ⭐ Mais popular
+            </span>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Apoiador</p>
+            <p className="mt-2 font-heading text-4xl font-black text-foreground">
+              R$&nbsp;10<span className="text-2xl">,99</span>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Pagamento único · pra sempre</p>
+            <ul className="mt-6 flex flex-1 flex-col gap-3">
+              {SUPPORTER_INCLUDED.map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/sign-up"
+              className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Criar conta e começar
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Sem anúncios · sem mensalidade · sem vender seus dados · pagamento seguro via Stripe
+        </p>
       </section>
 
       <footer className="border-t border-border">

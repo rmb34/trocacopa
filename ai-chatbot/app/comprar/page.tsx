@@ -6,14 +6,14 @@ import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
 import { Logo } from '@/components/logo'
 import { LogoutButton } from '@/components/logout-button'
-import { Check, ArrowRight, Loader2, ArrowLeft } from 'lucide-react'
+import { Check, ArrowRight, Loader2, ArrowLeft, Star } from 'lucide-react'
 
 const FEATURES = [
-  'Álbum digital completo — 993 figurinhas',
-  'Controle de repetidas por seleção',
-  'Perfil público compartilhável por link',
-  'Instala no celular (PWA) — sem App Store',
-  'Acesso vitalício, sem assinatura',
+  'Libera sua lista de repetidas para trocar',
+  'Inventário "tenho para troca" no seu perfil público',
+  'Selo ⭐ Apoiador no seu perfil',
+  'Acesso vitalício — uma vez, sem mensalidade',
+  'Apoia um projeto independente, sem anúncios',
 ]
 
 export default function ComprarPage() {
@@ -67,14 +67,19 @@ export default function ComprarPage() {
       <div className="mt-8 w-full max-w-sm">
         <div className="rounded-2xl border border-border bg-card p-8 shadow-md">
           {/* Price */}
-          <p className="text-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Acesso completo
-          </p>
-          <p className="mt-2 text-center font-heading text-6xl font-black text-foreground">
+          <div className="mb-2 flex items-center justify-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-primary">
+            <Star className="h-4 w-4 fill-current" />
+            Vire Apoiador
+          </div>
+          <p className="text-center font-heading text-6xl font-black text-foreground">
             R$<span className="text-5xl">10</span><span className="text-3xl">,99</span>
           </p>
           <p className="mt-1 text-center text-sm text-muted-foreground">
-            Pagamento único · Sem mensalidade
+            Pagamento único · pra sempre · sem mensalidade
+          </p>
+          <p className="mx-auto mt-3 max-w-xs text-center text-sm text-muted-foreground">
+            Apoie o projeto e libere as trocas. Feito por colecionador, sem anúncios e sem vender
+            seus dados.
           </p>
 
           {/* Features */}
@@ -100,7 +105,8 @@ export default function ComprarPage() {
               </>
             ) : (
               <>
-                Comprar agora
+                <Star className="h-4 w-4 fill-current" />
+                Virar Apoiador
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
