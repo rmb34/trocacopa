@@ -16,10 +16,15 @@ const archivo = Archivo({
 })
 
 export const metadata: Metadata = {
-  title: 'TrocaCopa — Monte e troque sua coleção da Copa',
+  metadataBase: new URL(
+    process.env.BETTER_AUTH_URL ?? 'https://ai-chatbot-beta-plum.vercel.app',
+  ),
+  title: {
+    default: 'TrocaCopa — Álbum de figurinhas da Copa 2026 no celular',
+    template: '%s · TrocaCopa',
+  },
   description:
-    'Gerencie seu álbum de figurinhas da Copa do Mundo, descubra suas repetidas e encontre colecionadores para trocar perto de você.',
-  generator: 'v0.app',
+    'Gerencie seu álbum de figurinhas da Copa do Mundo 2026, descubra suas repetidas e encontre colecionadores para trocar perto de você.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -46,7 +51,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#0b5d3b',
+  themeColor: '#D6177E',
 }
 
 export default function RootLayout({
