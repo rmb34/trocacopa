@@ -2,9 +2,8 @@ import Stripe from 'stripe'
 import { db } from '@/lib/db'
 import { purchase } from '@/lib/db/schema'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 export async function POST(request: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')
 
