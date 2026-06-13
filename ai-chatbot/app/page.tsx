@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 import { auth } from '@/lib/auth'
+import { getPurchaseStatus } from '@/app/actions/purchase'
 import { Logo } from '@/components/logo'
+import { LogoutButton } from '@/components/logout-button'
 import { ProductPreview } from '@/components/landing/product-preview'
 import { TOTAL_STICKERS } from '@/lib/catalog'
 import { BookOpen, Copy, Users, Check, ArrowRight, Smartphone, Trophy } from 'lucide-react'
@@ -92,7 +94,18 @@ const jsonLd = {
 
 export default async function LandingPage() {
   const session = await auth.api.getSession({ headers: await headers() })
-  if (session?.user) redirect('/dashboard')
+  // Paid users go straight to the app. Logged-in-but-unpaid users can still
+  // view the landing (so they aren't trapped on /comprar) — with CTAs that
+  // point to checkout instead of sign-up.
+  let pendingCheckout = false
+  if (session?.user) {
+    const status = await getPurchaseStatus(session.user.id)
+    if (status === 'paid') redirect('/dashboard')
+    pendingCheckout = true
+  }
+
+  const primaryCtaHref = pendingCheckout ? '/comprar' : '/sign-up'
+  const primaryCtaLabel = pendingCheckout ? 'Finalizar compra' : 'Criar conta e começar'
 
   return (
     <div className="min-h-svh bg-background">
@@ -109,18 +122,34 @@ export default async function LandingPage() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Logo />
         <div className="flex items-center gap-2">
-          <Link
-            href="/sign-in"
-            className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Entrar
-          </Link>
-          <Link
-            href="/sign-up"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Começar
-          </Link>
+          {pendingCheckout ? (
+            <>
+              <LogoutButton className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                Sair
+              </LogoutButton>
+              <Link
+                href="/comprar"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Finalizar compra
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Entrar
+              </Link>
+              <Link
+                href="/sign-up"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Começar
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -166,18 +195,24 @@ export default async function LandingPage() {
 
             <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:items-start">
               <Link
-                href="/sign-up"
+                href={primaryCtaHref}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
               >
-                Criar conta e começar
+                {primaryCtaLabel}
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/sign-in"
-                className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto"
-              >
-                Já tenho conta
-              </Link>
+              {pendingCheckout ? (
+                <LogoutButton className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto">
+                  Sair da conta
+                </LogoutButton>
+              ) : (
+                <Link
+                  href="/sign-in"
+                  className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto"
+                >
+                  Já tenho conta
+                </Link>
+              )}
             </div>
 
             <p className="mt-4 text-xs text-muted-foreground">
@@ -238,7 +273,7 @@ export default async function LandingPage() {
           </ul>
 
           <Link
-            href="/sign-up"
+            href={primaryCtaHref}
             className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Comprar agora
