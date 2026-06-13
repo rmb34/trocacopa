@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import { TEAMS, GROUPS, type Team } from '@/lib/catalog'
+import { TeamFlag } from '@/components/team-flag'
 import { adjustStickerCount, setManyCounts } from '@/app/actions/stickers'
 import { computeStats, type EntryMap } from '@/lib/stats'
 import { Card } from '@/components/ui/card'
@@ -18,6 +19,7 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
   const [entries, setEntries] = useState<EntryMap>(initialEntries)
   const [group, setGroup] = useState<string>(GROUPS[0])
   const [filter, setFilter] = useState<Filter>('all')
+  const [visibleCount, setVisibleCount] = useState(10)
   const [, startTransition] = useTransition()
 
   const stats = useMemo(() => computeStats(entries), [entries])
@@ -25,6 +27,15 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
     () => (group === 'Todas' ? TEAMS : TEAMS.filter((t) => t.group === group)),
     [group],
   )
+
+  // Reset pagination when group changes
+  useEffect(() => { setVisibleCount(10) }, [group])
+
+  const visibleTeams = useMemo(
+    () => group === 'Todas' ? teamsInGroup.slice(0, visibleCount) : teamsInGroup,
+    [teamsInGroup, group, visibleCount],
+  )
+  const hasMore = group === 'Todas' && visibleCount < teamsInGroup.length
 
   function countFor(code: string) {
     return entries[code] ?? 0
@@ -170,7 +181,7 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
 
       {/* Teams */}
       <div className="flex flex-col gap-5">
-        {teamsInGroup.map((team) => {
+        {visibleTeams.map((team) => {
           const nums = visibleNumbers(team)
           let owned = 0
           for (let n = 1; n <= team.stickerCount; n++) {
@@ -181,9 +192,7 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
             <Card key={team.code} className="p-4">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span aria-hidden className="text-2xl">
-                    {team.flag}
-                  </span>
+                  <TeamFlag team={team} size="lg" />
                   <div>
                     <p className="font-heading font-bold leading-tight text-foreground">
                       {team.name}
@@ -236,6 +245,16 @@ export function AlbumManager({ initialEntries }: { initialEntries: EntryMap }) {
             </Card>
           )
         })}
+
+        {hasMore && (
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setVisibleCount((c) => c + 10)}
+          >
+            Ver mais {Math.min(10, teamsInGroup.length - visibleCount)} seleções
+          </Button>
+        )}
       </div>
     </div>
   )

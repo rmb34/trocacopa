@@ -37,6 +37,7 @@ export type TeamProgress = {
   name: string
   group: string
   flag: string
+  flagCode: string
   owned: number
   total: number
   percent: number
@@ -53,6 +54,7 @@ export function computeTeamProgress(entries: EntryMap): TeamProgress[] {
       name: team.name,
       group: team.group,
       flag: team.flag,
+      flagCode: team.flagCode,
       owned,
       total: team.stickerCount,
       percent: Math.round((owned / team.stickerCount) * 100),

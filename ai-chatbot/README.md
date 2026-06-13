@@ -1,14 +1,15 @@
 # TrocaCopa
 
-Gerenciador de álbum de figurinhas para a Copa do Mundo 2026. Controle o que você tem, o que falta e encontre colecionadores para trocar — tudo no celular, com suporte offline via PWA.
+Gerenciador de álbum de figurinhas para a Copa do Mundo FIFA 2026. Controle o que você tem, o que falta e encontre colecionadores para trocar — tudo no celular, com suporte offline via PWA.
 
 ## Funcionalidades
 
 - **Álbum digital** — 993 figurinhas: 48 seleções × 20 + FWC (19) + Coca-Cola (14), grupos A–L + Especial
-- **Controle de repetidas** — lista agrupada por seleção com contagem de extras
-- **Trocas inteligentes** — cruza sua coleção com a de outros colecionadores e mostra matches mútuos com botão de contato via WhatsApp
-- **Perfil público** — link compartilhável `/u/[slug]` com progresso, lista de faltas e repetidas
-- **Acesso único** — compra única via Stripe (Pix + cartão), sem assinatura
+- **Bandeiras reais** — bandeiras via flagcdn.com para todas as 48 seleções
+- **Controle de repetidas** — lista agrupada por seleção com contagem de extras e link de compartilhamento
+- **Trocas inteligentes** — cruza sua coleção com outros colecionadores e mostra matches mútuos com contato via WhatsApp
+- **Perfil público** — link compartilhável `/u/[slug]` com progresso, faltas e repetidas
+- **Acesso único** — compra única via Stripe (Pix + cartão, R$19,90), sem assinatura
 - **PWA** — instalável no celular, funciona offline
 
 ## Stack
@@ -25,20 +26,27 @@ Gerenciador de álbum de figurinhas para a Copa do Mundo 2026. Controle o que vo
 | Deploy | Vercel |
 | Testes | Vitest |
 
+## Paleta de cores
+
+Inspirada no álbum oficial Panini Copa 2026:
+- **Primário** — azul FIFA (`#003DA5`) como cor principal de botões e UI
+- **Accent** — dourado Copa (`#C8A84B`) para destaques e repetidas
+- Dark mode com fundo azul marinho profundo
+
 ## Estrutura de rotas
 
 ```
-/                   Landing pública
-/sign-in            Login
-/sign-up            Cadastro
-/comprar            Página de compra (gate para usuários não pagos)
-/dashboard          Painel do colecionador
-/album              Álbum completo com filtros por grupo
-/repetidas          Lista de figurinhas repetidas
-/trocas             Match de trocas com outros colecionadores
-/perfil             Edição de perfil
-/u/[slug]           Perfil público (sem autenticação)
-/api/checkout       POST — cria sessão Stripe
+/                    Landing pública
+/sign-in             Login
+/sign-up             Cadastro
+/comprar             Página de compra (gate para usuários não pagos)
+/dashboard           Painel do colecionador
+/album               Álbum completo com filtros por grupo
+/repetidas           Lista de figurinhas repetidas
+/trocas              Match de trocas com outros colecionadores
+/perfil              Edição de perfil
+/u/[slug]            Perfil público (sem autenticação)
+/api/checkout        POST — cria sessão Stripe
 /api/webhooks/stripe POST — recebe eventos Stripe
 ```
 
@@ -102,19 +110,20 @@ DATABASE_URL=<sua-url> pnpm drizzle-kit push
 
 ## Deploy (Vercel)
 
-O projeto está configurado para deploy automático no Vercel.
-
 ```bash
 vercel --prod
 ```
 
 **Variáveis obrigatórias no Vercel Dashboard:**
-- `DATABASE_URL`
-- `BETTER_AUTH_SECRET`
-- `BETTER_AUTH_URL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `PRICE_CENTS`
+
+| Variável | Descrição |
+|----------|-----------|
+| `DATABASE_URL` | URL de conexão Neon |
+| `BETTER_AUTH_SECRET` | String aleatória longa (32+ chars) |
+| `BETTER_AUTH_URL` | URL pública do app (ex: `https://trocacopa.vercel.app`) |
+| `STRIPE_SECRET_KEY` | Chave secreta Stripe (sk_live_...) |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret do webhook Stripe |
+| `PRICE_CENTS` | Valor em centavos (ex: `1990` para R$19,90) |
 
 **Configurar webhook do Stripe após o primeiro deploy:**
 1. Stripe Dashboard → Developers → Webhooks → Add endpoint
@@ -136,6 +145,18 @@ purchase        — registro de compra Stripe (userId único, status)
 
 A tabela `sticker_entry` tem unique constraint em `(userId, stickerCode)`, necessária para o upsert otimista do álbum.
 
+## Catálogo
+
+Arquivo: `lib/catalog.ts`
+
+Cada seleção tem:
+- `code` — identificador único (ex: `BRA`, `MEX`)
+- `name` — nome em português
+- `group` — grupo `A`–`L` ou `Especial`
+- `flag` — emoji da bandeira (usado em textos compartilhados)
+- `flagCode` — código ISO 3166-1 alpha-2 para flagcdn.com (ex: `br`, `mx`)
+- `stickerCount` — número de figurinhas
+
 ## Licença
 
-Privado. Não afiliado à FIFA ou a fabricantes de álbuns.
+Privado. Não afiliado à FIFA, Panini ou Coca-Cola.
