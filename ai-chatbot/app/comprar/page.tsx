@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
 import { Logo } from '@/components/logo'
+import { LogoutButton } from '@/components/logout-button'
 import { Check, ArrowRight, Loader2, ArrowLeft } from 'lucide-react'
 
 const FEATURES = [
@@ -54,6 +55,10 @@ export default function ComprarPage() {
         <ArrowLeft className="h-4 w-4" />
         Voltar
       </Link>
+
+      <LogoutButton className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+        Sair da conta
+      </LogoutButton>
 
       <Link href="/" aria-label="Início">
         <Logo />

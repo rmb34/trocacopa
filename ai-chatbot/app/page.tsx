@@ -5,7 +5,6 @@ import type { Metadata } from 'next'
 import { auth } from '@/lib/auth'
 import { getPurchaseStatus } from '@/app/actions/purchase'
 import { Logo } from '@/components/logo'
-import { LogoutButton } from '@/components/logout-button'
 import { ProductPreview } from '@/components/landing/product-preview'
 import { TOTAL_STICKERS } from '@/lib/catalog'
 import { BookOpen, Copy, Users, Check, ArrowRight, Smartphone, Trophy } from 'lucide-react'
@@ -123,17 +122,12 @@ export default async function LandingPage() {
         <Logo />
         <div className="flex items-center gap-2">
           {pendingCheckout ? (
-            <>
-              <LogoutButton className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-                Sair
-              </LogoutButton>
-              <Link
-                href="/comprar"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                Finalizar compra
-              </Link>
-            </>
+            <Link
+              href="/comprar"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Finalizar compra
+            </Link>
           ) : (
             <>
               <Link
@@ -201,11 +195,7 @@ export default async function LandingPage() {
                 {primaryCtaLabel}
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              {pendingCheckout ? (
-                <LogoutButton className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto">
-                  Sair da conta
-                </LogoutButton>
-              ) : (
+              {!pendingCheckout && (
                 <Link
                   href="/sign-in"
                   className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto"
