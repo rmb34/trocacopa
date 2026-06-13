@@ -8,6 +8,7 @@ export function LogoutButton({ className, children }: { className?: string; chil
 
   async function handle() {
     await authClient.signOut()
+    router.push('/')
     router.refresh()
   }
 
