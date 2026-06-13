@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
 import { getProfileBySlug, getEntriesByUserId, getPurchaseStatus } from '@/lib/db/queries'
 import { computeStats, missingCodes, duplicateCodes } from '@/lib/stats'
-import { publicProfileSections } from '@/lib/entitlements'
+import { publicProfileSections, isSupporter } from '@/lib/entitlements'
 import { TEAMS } from '@/lib/catalog'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent } from '@/components/ui/card'
@@ -22,9 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!profile || !profile.isPublic) return {}
   const entries = await getEntriesByUserId(profile.userId)
   const stats = computeStats(entries)
+  // Only supporters expose their trade count publicly; free profiles show
+  // only what they're looking for.
+  const supporter = isSupporter(await getPurchaseStatus(profile.userId))
+  const description = supporter
+    ? `${stats.percent}% do álbum completo · ${stats.duplicates} figurinhas para troca`
+    : `${stats.percent}% do álbum completo · ${stats.missing} figurinhas faltando`
   return {
     title: `${profile.displayName} — TrocaCopa`,
-    description: `${stats.percent}% do álbum completo · ${stats.duplicates} figurinhas para troca`,
+    description,
   }
 }
 
