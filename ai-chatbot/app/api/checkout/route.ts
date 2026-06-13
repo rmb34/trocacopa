@@ -5,9 +5,8 @@ import { db } from '@/lib/db'
 import { purchase } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 export async function POST() {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
