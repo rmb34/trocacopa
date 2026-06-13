@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getOrCreateProfile } from '@/app/actions/profile'
-import { getPurchaseStatus } from '@/app/actions/purchase'
+import { getPurchaseStatus } from '@/lib/db/queries'
 import { getMyEntries } from '@/app/actions/stickers'
 import { computeStats, computeTeamProgress } from '@/lib/stats'
 import { canAccessTrades } from '@/lib/entitlements'

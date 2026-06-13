@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getOrCreateProfile } from '@/app/actions/profile'
-import { getPurchaseStatus } from '@/app/actions/purchase'
+import { getPurchaseStatus } from '@/lib/db/queries'
 import { getMyEntries } from '@/app/actions/stickers'
 import { canAccessTrades } from '@/lib/entitlements'
 import { duplicateCodes } from '@/lib/stats'
