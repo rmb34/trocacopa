@@ -4,42 +4,33 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { Logo } from '@/components/logo'
-import { Button } from '@/components/ui/button'
+import { useDarkMode } from '@/components/theme-toggle'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
-import {
-  LayoutDashboard,
-  BookOpen,
-  Copy,
-  ArrowLeftRight,
-  User,
-  LogOut,
-} from 'lucide-react'
+import { LayoutDashboard, BookOpen, Copy, LogOut, User, Moon, Sun } from 'lucide-react'
 
 const NAV = [
   { href: '/dashboard', label: 'Painel',    icon: LayoutDashboard },
   { href: '/album',     label: 'Álbum',     icon: BookOpen },
   { href: '/repetidas', label: 'Repetidas', icon: Copy },
-  { href: '/trocas',    label: 'Trocas',    icon: ArrowLeftRight },
 ]
 
 export function AppHeader({
   displayName,
-  slug,
 }: {
   displayName: string
   slug: string
 }) {
   const pathname = usePathname()
   const router = useRouter()
+  const { dark, toggle } = useDarkMode()
 
   const initials = displayName
     .split(' ')
@@ -62,7 +53,7 @@ export function AppHeader({
     <>
       {/* Top header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" aria-label="TrocaCopa">
               <Logo />
@@ -87,41 +78,30 @@ export function AppHeader({
             </nav>
           </div>
 
-          {/* User menu */}
+          {/* Account menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 px-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-xs font-semibold text-primary-foreground">
-                    {initials || 'TC'}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden max-w-[8rem] truncate text-sm font-medium sm:inline">
-                  {displayName}
-                </span>
-              </Button>
+            <DropdownMenuTrigger
+              aria-label="Conta"
+              className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary text-xs font-semibold text-primary-foreground">
+                  {initials || 'TC'}
+                </AvatarFallback>
+              </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel className="truncate">{displayName}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/perfil">
-                  <User className="mr-2 h-4 w-4" />
-                  Meu perfil
-                </Link>
+              <DropdownMenuItem render={<Link href="/perfil" />}>
+                <User className="h-4 w-4" />
+                Meu perfil
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href={`/u/${slug}`}>
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Ver perfil público
-                </Link>
+              <DropdownMenuItem closeOnClick={false} onClick={toggle}>
+                {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {dark ? 'Modo claro' : 'Modo escuro'}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={signOut}
-                className="text-destructive focus:text-destructive"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem variant="destructive" onClick={signOut}>
+                <LogOut className="h-4 w-4" />
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
