@@ -25,6 +25,13 @@ export const metadata: Metadata = {
   },
   description:
     'Gerencie seu álbum de figurinhas da Copa do Mundo 2026, descubra suas repetidas e encontre colecionadores para trocar perto de você.',
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    siteName: 'TrocaCopa',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'TrocaCopa' }],
+  },
+  twitter: { card: 'summary_large_image', images: ['/og.png'] },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
