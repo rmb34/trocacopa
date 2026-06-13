@@ -101,17 +101,12 @@ const jsonLd = {
 export default async function LandingPage() {
   const session = await auth.api.getSession({ headers: await headers() })
   // Paid users go straight to the app. Logged-in-but-unpaid users can still
-  // view the landing (so they aren't trapped on /comprar) — with CTAs that
-  // point to checkout instead of sign-up.
-  let pendingCheckout = false
+  // view the landing (so they aren't trapped on /comprar). The page itself is
+  // identical for everyone — pure marketing with login / sign-up.
   if (session?.user) {
     const status = await getPurchaseStatus(session.user.id)
     if (status === 'paid') redirect('/dashboard')
-    pendingCheckout = true
   }
-
-  const primaryCtaHref = pendingCheckout ? '/comprar' : '/sign-up'
-  const primaryCtaLabel = pendingCheckout ? 'Finalizar compra' : 'Criar conta e começar'
 
   return (
     <div className="min-h-svh bg-background">
@@ -128,29 +123,18 @@ export default async function LandingPage() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Logo />
         <div className="flex items-center gap-2">
-          {pendingCheckout ? (
-            <Link
-              href="/comprar"
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Finalizar compra
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/sign-in"
-                className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Entrar
-              </Link>
-              <Link
-                href="/sign-up"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                Começar
-              </Link>
-            </>
-          )}
+          <Link
+            href="/sign-in"
+            className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Entrar
+          </Link>
+          <Link
+            href="/sign-up"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Criar conta
+          </Link>
         </div>
       </header>
 
@@ -196,20 +180,18 @@ export default async function LandingPage() {
 
             <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:items-start">
               <Link
-                href={primaryCtaHref}
+                href="/sign-up"
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
               >
-                {primaryCtaLabel}
+                Montar meu álbum agora
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              {!pendingCheckout && (
-                <Link
-                  href="/sign-in"
-                  className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto"
-                >
-                  Já tenho conta
-                </Link>
-              )}
+              <Link
+                href="/sign-in"
+                className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto"
+              >
+                Já tenho conta
+              </Link>
             </div>
 
             <p className="mt-4 text-xs text-muted-foreground">
@@ -270,10 +252,10 @@ export default async function LandingPage() {
           </ul>
 
           <Link
-            href={primaryCtaHref}
+            href="/sign-up"
             className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90"
           >
-            Comprar agora
+            Criar conta e começar
             <ArrowRight className="h-4 w-4" />
           </Link>
 
