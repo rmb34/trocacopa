@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer, serial } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, integer, serial, unique } from 'drizzle-orm/pg-core'
 
 // --- Better Auth required tables -------------------------------------------
 // Column names are camelCase to match Better Auth's defaults. Do not rename.
@@ -78,7 +78,9 @@ export const stickerEntry = pgTable('sticker_entry', {
   count: integer('count').notNull().default(0),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-})
+}, (t) => [
+  unique('sticker_entry_user_code_unique').on(t.userId, t.stickerCode),
+])
 
 // One purchase record per user (unique userId). Tracks Stripe checkout status.
 export const purchase = pgTable('purchase', {
