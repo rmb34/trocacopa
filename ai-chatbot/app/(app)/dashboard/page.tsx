@@ -1,22 +1,18 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getOrCreateProfile } from '@/app/actions/profile'
-import { getPurchaseStatus } from '@/lib/db/queries'
 import { getMyEntries } from '@/app/actions/stickers'
 import { computeStats, computeTeamProgress } from '@/lib/stats'
-import { canAccessTrades } from '@/lib/entitlements'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Copy, CheckCircle2, CircleDashed, Layers, Star } from 'lucide-react'
+import { BookOpen, Copy, CheckCircle2, CircleDashed, Layers } from 'lucide-react'
 import { TeamFlag } from '@/components/team-flag'
 
 export default async function DashboardPage() {
   const profile = await getOrCreateProfile()
   if (!profile) redirect('/sign-in')
 
-  const status = await getPurchaseStatus(profile.userId)
-  const isSupporter = canAccessTrades(status)
   const entries = await getMyEntries()
   const stats = computeStats(entries)
   const teams = computeTeamProgress(entries)
@@ -108,43 +104,21 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick action */}
-      {isSupporter ? (
-        <Link href="/repetidas">
-          <Card className="transition-colors hover:border-primary/50">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
-                <Copy className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Minhas repetidas</p>
-                <p className="text-sm text-muted-foreground">
-                  Veja o que sobra e compartilhe para trocar
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      ) : (
-        <Link href="/comprar">
-          <Card className="border-primary/30 transition-colors hover:border-primary/60">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="grid h-11 w-11 place-items-center rounded-lg bg-accent text-accent-foreground">
-                <Star className="h-5 w-5 fill-current" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">
-                  {stats.duplicates > 0
-                    ? `Você tem ${stats.duplicates} repetida${stats.duplicates !== 1 ? 's' : ''} para trocar`
-                    : 'Libere suas trocas'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Vire Apoiador por R$ 10,99 e organize suas trocas
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      )}
+      <Link href="/repetidas">
+        <Card className="transition-colors hover:border-primary/50">
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
+              <Copy className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">Minhas repetidas</p>
+              <p className="text-sm text-muted-foreground">
+                Veja o que sobra e compartilhe para trocar
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
 
       {/* Team progress */}
       <Card>
