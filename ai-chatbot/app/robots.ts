@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       // Authenticated/app areas have no SEO value and shouldn't be crawled.
-      disallow: ['/dashboard', '/album', '/repetidas', '/perfil', '/comprar', '/api/'],
+      disallow: ['/dashboard', '/album', '/repetidas', '/perfil', '/api/'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   }

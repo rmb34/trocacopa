@@ -17,10 +17,8 @@ type Filter = 'all' | 'missing' | 'owned' | 'duplicates'
 
 export function AlbumManager({
   initialEntries,
-  supporter,
 }: {
   initialEntries: EntryMap
-  supporter: boolean
 }) {
   const [entries, setEntries] = useState<EntryMap>(initialEntries)
   const [group, setGroup] = useState<string>(GROUPS[0])
@@ -89,13 +87,11 @@ export function AlbumManager({
     })
   }
 
-  // The "Repetidas" filter is an Apoiador feature — listing duplicates is
-  // exactly what the freemium wall gates. Free users don't get the chip.
   const filters: { key: Filter; label: string }[] = [
     { key: 'all', label: 'Todas' },
     { key: 'missing', label: 'Faltando' },
     { key: 'owned', label: 'Tenho' },
-    ...(supporter ? [{ key: 'duplicates' as const, label: 'Repetidas' }] : []),
+    { key: 'duplicates', label: 'Repetidas' },
   ]
 
   function visibleNumbers(team: Team): number[] {
@@ -105,8 +101,7 @@ export function AlbumManager({
       const c = countFor(`${team.code}-${n}`)
       if (filter === 'missing') return c === 0
       if (filter === 'owned') return c >= 1
-      // Defensive: free users never get a duplicates-only listing.
-      if (filter === 'duplicates') return supporter && c > 1
+      if (filter === 'duplicates') return c > 1
       return true
     })
   }
