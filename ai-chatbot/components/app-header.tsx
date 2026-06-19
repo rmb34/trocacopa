@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, BookOpen, Copy, LogOut, User, Moon, Sun, Star } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Copy, LogOut, User, Moon, Sun } from 'lucide-react'
 
 const NAV = [
   { href: '/dashboard', label: 'Painel',    icon: LayoutDashboard },
@@ -24,11 +24,9 @@ const NAV = [
 
 export function AppHeader({
   displayName,
-  supporter,
 }: {
   displayName: string
   slug: string
-  supporter: boolean
 }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -97,17 +95,6 @@ export function AppHeader({
                 <User className="h-4 w-4" />
                 Meu perfil
               </DropdownMenuItem>
-              {supporter ? (
-                <DropdownMenuItem disabled className="opacity-100">
-                  <Star className="h-4 w-4 fill-accent text-accent" />
-                  Apoiador
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem render={<Link href="/comprar" />}>
-                  <Star className="h-4 w-4" />
-                  Apoiar o projeto
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem closeOnClick={false} onClick={toggle}>
                 {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 {dark ? 'Modo claro' : 'Modo escuro'}

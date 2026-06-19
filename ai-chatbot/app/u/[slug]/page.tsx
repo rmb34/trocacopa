@@ -1,15 +1,13 @@
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
-import { getProfileBySlug, getEntriesByUserId, getPurchaseStatus } from '@/lib/db/queries'
+import { getProfileBySlug, getEntriesByUserId } from '@/lib/db/queries'
 import { computeStats, missingCodes, duplicateCodes } from '@/lib/stats'
-import { publicProfileSections, isSupporter } from '@/lib/entitlements'
 import { TEAMS } from '@/lib/catalog'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/logo'
 import { ShareButton } from '@/components/share-button'
-import { SupporterBadge } from '@/components/supporter-badge'
 import { TeamFlag } from '@/components/team-flag'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -22,15 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!profile || !profile.isPublic) return {}
   const entries = await getEntriesByUserId(profile.userId)
   const stats = computeStats(entries)
-  // Only supporters expose their trade count publicly; free profiles show
-  // only what they're looking for.
-  const supporter = isSupporter(await getPurchaseStatus(profile.userId))
-  const description = supporter
-    ? `${stats.percent}% do álbum completo · ${stats.duplicates} figurinhas para troca`
-    : `${stats.percent}% do álbum completo · ${stats.missing} figurinhas faltando`
   return {
     title: `${profile.displayName} — TrocaCopa`,
-    description,
+    description: `${stats.percent}% do álbum completo · ${stats.duplicates} figurinhas para troca`,
   }
 }
 
@@ -42,16 +34,8 @@ export default async function PublicProfilePage({ params }: Props) {
   const entries = await getEntriesByUserId(profile.userId)
   const stats = computeStats(entries)
 
-  // Gate by the profile OWNER's status: free collectors expose only their
-  // wishlist ("Procuro"); supporters also expose their trade inventory + badge.
-  const ownerStatus = await getPurchaseStatus(profile.userId)
-  const sections = publicProfileSections(
-    ownerStatus,
-    missingCodes(entries),
-    duplicateCodes(entries),
-  )
-  const missing = new Set(sections.missing)
-  const duplicates = new Set(sections.duplicates)
+  const missing = new Set(missingCodes(entries))
+  const duplicates = new Set(duplicateCodes(entries))
 
   const teamsWithMissing = TEAMS.map((team) => ({
     team,
@@ -93,7 +77,6 @@ export default async function PublicProfilePage({ params }: Props) {
             <h1 className="font-heading text-2xl font-extrabold text-foreground sm:text-3xl">
               {profile.displayName}
             </h1>
-            {sections.showBadge && <SupporterBadge />}
           </div>
           {profile.city && (
             <p className="mt-1 text-sm text-muted-foreground">{profile.city}</p>
@@ -110,18 +93,13 @@ export default async function PublicProfilePage({ params }: Props) {
             </div>
             <Progress value={stats.percent} className="h-3" />
             <p className="text-sm text-muted-foreground">
-              {stats.owned} de {stats.total} figurinhas
-              {sections.showBadge && (
-                <>
-                  {' '}·{' '}
-                  <span className="font-medium text-foreground">{stats.duplicates}</span> para troca
-                </>
-              )}
+              {stats.owned} de {stats.total} figurinhas ·{' '}
+              <span className="font-medium text-foreground">{stats.duplicates}</span> para troca
             </p>
           </CardContent>
         </Card>
 
-        <div className={`grid gap-6 ${sections.showBadge ? 'lg:grid-cols-2' : ''}`}>
+        <div className="grid gap-6 lg:grid-cols-2">
           <section>
             <h2 className="mb-3 flex items-center gap-2 font-heading text-lg font-bold text-foreground">
               Procuro <Badge variant="secondary">{stats.missing}</Badge>
@@ -147,7 +125,6 @@ export default async function PublicProfilePage({ params }: Props) {
             )}
           </section>
 
-          {sections.showBadge && (
           <section>
             <h2 className="mb-3 flex items-center gap-2 font-heading text-lg font-bold text-foreground">
               Tenho para troca <Badge variant="secondary">{stats.duplicates}</Badge>
@@ -172,7 +149,6 @@ export default async function PublicProfilePage({ params }: Props) {
               </div>
             )}
           </section>
-          )}
         </div>
       </main>
     </div>
