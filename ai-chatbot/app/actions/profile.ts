@@ -61,9 +61,14 @@ export async function getOrCreateProfile() {
       displayName: user.name || 'Colecionador',
       slug,
     })
+    .onConflictDoNothing({ target: profile.userId })
     .returning()
 
-  return inserted[0]
+  if (inserted.length > 0) return inserted[0]
+
+  // Lost the race to a concurrent request that inserted first — read its row.
+  const [row] = await db.select().from(profile).where(eq(profile.userId, user.id)).limit(1)
+  return row
 }
 
 export async function updateProfile(input: {
