@@ -58,3 +58,6 @@ Thumbs.db
 
 # Drizzle migrations (drizzle-kit push é a fonte da verdade)
 drizzle/
+
+# Notas internas de pendências (local, não versionar)
+pendencias.md

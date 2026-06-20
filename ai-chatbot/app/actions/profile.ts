@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { profile } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
@@ -91,4 +91,28 @@ export async function updateProfile(input: {
 
   revalidatePath('/perfil')
   revalidatePath('/dashboard')
+}
+
+export async function publishProfile() {
+  const userId = await getUserId()
+
+  const [activated] = await db
+    .update(profile)
+    .set({ isPublic: true, updatedAt: new Date() })
+    .where(and(eq(profile.userId, userId), eq(profile.isPublic, false)))
+    .returning({ slug: profile.slug })
+
+  if (activated) {
+    revalidatePath('/perfil')
+    revalidatePath('/dashboard')
+    return { slug: activated.slug, activated: true }
+  }
+
+  const [existing] = await db
+    .select({ slug: profile.slug })
+    .from(profile)
+    .where(eq(profile.userId, userId))
+    .limit(1)
+
+  return { slug: existing.slug, activated: false }
 }
