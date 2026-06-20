@@ -61,7 +61,10 @@ export async function getOrCreateProfile() {
       displayName: user.name || 'Colecionador',
       slug,
     })
-    .onConflictDoNothing({ target: profile.userId })
+    // No target: a concurrent request for the same user can collide on
+    // either the userId or the slug unique constraint (same name → same
+    // generated slug) — catch both.
+    .onConflictDoNothing()
     .returning()
 
   if (inserted.length > 0) return inserted[0]
