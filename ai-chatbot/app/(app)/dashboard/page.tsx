@@ -5,9 +5,9 @@ import { getMyEntries } from '@/app/actions/stickers'
 import { computeStats, computeTeamProgress } from '@/lib/stats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Button } from '@/components/ui/button'
 import { BookOpen, Copy, CheckCircle2, CircleDashed, Layers } from 'lucide-react'
 import { TeamFlag } from '@/components/team-flag'
+import { ShareProfileCard } from '@/components/share-profile-card'
 
 export default async function DashboardPage() {
   const profile = await getOrCreateProfile()
@@ -47,19 +47,29 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Heading */}
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">Olá, {firstName} 👋</p>
-          <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground">
-            Seu painel
-          </h1>
-        </div>
-        <Button asChild size="lg" className="h-auto shrink-0 gap-2 px-4 py-2.5">
-          <Link href="/album">
-            <BookOpen className="h-4 w-4" />
-            Álbum
-          </Link>
-        </Button>
+      <div>
+        <p className="text-sm font-medium text-muted-foreground">Olá, {firstName} 👋</p>
+        <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground">
+          Seu painel
+        </h1>
+      </div>
+
+      {/* Quick actions: álbum + compartilhar perfil */}
+      <div className="grid grid-cols-2 gap-3">
+        <Link href="/album">
+          <Card className="transition-colors hover:border-primary/50">
+            <CardContent className="flex items-center gap-3 p-4">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground">Álbum</p>
+                <p className="truncate text-xs text-muted-foreground">Ver figurinhas</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <ShareProfileCard slug={profile.slug} isPublic={profile.isPublic} />
       </div>
 
       {/* Completion hero */}
