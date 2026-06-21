@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { TEAMS, GROUPS, type Team } from '@/lib/catalog'
 import { TeamFlag } from '@/components/team-flag'
-import { adjustStickerCount, setManyCounts } from '@/app/actions/stickers'
+import { adjustStickerCount, setManyCounts, setStickerCount } from '@/app/actions/stickers'
 import { computeStats, type EntryMap } from '@/lib/stats'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -54,6 +54,14 @@ export function AlbumManager({
     startTransition(async () => {
       try {
         await adjustStickerCount(code, delta)
+        // Wiping more than one copy at once is the highest-anxiety action in
+        // the album (real duplicates in hand, gone with one tap) — always
+        // offer a way back.
+        if (current > 1 && next === 0) {
+          toast(`Removeu ${current} cópias de ${code}.`, {
+            action: { label: 'Desfazer', onClick: () => restoreCount(code, current) },
+          })
+        }
       } catch {
         // revert on failure
         setEntries((prev) => ({ ...prev, [code]: current }))
@@ -62,8 +70,19 @@ export function AlbumManager({
     })
   }
 
+  function restoreCount(code: string, count: number) {
+    setEntries((prev) => ({ ...prev, [code]: count }))
+    startTransition(async () => {
+      try {
+        await setStickerCount(code, count)
+      } catch {
+        toast.error('Não foi possível desfazer. Tente de novo.')
+      }
+    })
+  }
+
   function markTeamComplete(team: Team) {
-    const updates = []
+    const updates: { stickerCode: string; count: number }[] = []
     const optimistic: EntryMap = {}
     for (let n = 1; n <= team.stickerCount; n++) {
       const code = `${team.code}-${n}`
@@ -318,7 +337,7 @@ function StickerCell({
         <div className="mt-2 flex items-center gap-1">
           <button
             onClick={onDec}
-            className="grid h-5 w-5 place-items-center rounded bg-background text-foreground shadow-sm hover:bg-secondary"
+            className="grid h-5 w-5 place-items-center rounded bg-background text-foreground ring-1 ring-foreground/10 hover:bg-secondary"
             aria-label={`Diminuir ${teamCode} ${n}`}
           >
             <Minus className="h-3 w-3" />
@@ -333,7 +352,7 @@ function StickerCell({
           </span>
           <button
             onClick={onInc}
-            className="grid h-5 w-5 place-items-center rounded bg-background text-foreground shadow-sm hover:bg-secondary"
+            className="grid h-5 w-5 place-items-center rounded bg-background text-foreground ring-1 ring-foreground/10 hover:bg-secondary"
             aria-label={`Aumentar ${teamCode} ${n}`}
           >
             <Plus className="h-3 w-3" />
