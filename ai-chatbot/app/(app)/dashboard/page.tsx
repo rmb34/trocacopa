@@ -5,7 +5,7 @@ import { getMyEntries } from '@/app/actions/stickers'
 import { computeStats, computeTeamProgress } from '@/lib/stats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { BookOpen, Copy, CheckCircle2, CircleDashed, Layers } from 'lucide-react'
+import { BookOpen, CheckCircle2, CircleDashed, Layers } from 'lucide-react'
 import { TeamFlag } from '@/components/team-flag'
 import { ShareProfileCard } from '@/components/share-profile-card'
 
@@ -20,28 +20,10 @@ export default async function DashboardPage() {
 
   const topTeams = [...teams].sort((a, b) => b.percent - a.percent).slice(0, 6)
 
-  const cards = [
-    {
-      label: 'Coladas',
-      value: stats.owned,
-      sub: `de ${stats.total}`,
-      icon: CheckCircle2,
-      tone: 'text-success',
-    },
-    {
-      label: 'Faltando',
-      value: stats.missing,
-      sub: 'para completar',
-      icon: CircleDashed,
-      tone: 'text-info',
-    },
-    {
-      label: 'Repetidas',
-      value: stats.duplicates,
-      sub: 'prontas p/ trocar',
-      icon: Layers,
-      tone: 'text-warn',
-    },
+  const inlineStats = [
+    { label: 'coladas', value: stats.owned, icon: CheckCircle2, tone: 'text-success' },
+    { label: 'faltando', value: stats.missing, icon: CircleDashed, tone: 'text-info' },
+    { label: 'repetidas', value: stats.duplicates, icon: Layers, tone: 'text-warn' },
   ]
 
   return (
@@ -72,74 +54,32 @@ export default async function DashboardPage() {
         <ShareProfileCard slug={profile.slug} isPublic={profile.isPublic} />
       </div>
 
-      {/* Completion hero */}
-      <Card className="overflow-hidden border-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
-        <CardContent className="flex flex-col gap-4 p-6">
+      {/* Progress */}
+      <Card>
+        <CardContent className="flex flex-col gap-4 p-5">
           <div className="flex items-baseline gap-2">
-            <span className="font-heading text-6xl font-black leading-none">
+            <span className="font-heading text-3xl font-black leading-none text-foreground">
               {stats.percent}%
             </span>
-            <span className="text-primary-foreground/70 text-sm">completo</span>
+            <span className="text-sm text-muted-foreground">completo</span>
           </div>
-          <Progress
-            value={stats.percent}
-            className="h-2.5 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
-          />
-          <p className="text-sm text-primary-foreground/80">
-            {stats.owned} de {stats.total} figurinhas ·{' '}
-            <span className="font-semibold text-primary-foreground">{stats.missing}</span> faltando
-          </p>
+          <Progress value={stats.percent} className="h-2.5" />
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {inlineStats.map((s) => (
+              <span key={s.label} className="flex items-center gap-1.5 text-sm">
+                <s.icon className={`h-4 w-4 ${s.tone}`} />
+                <span className="font-semibold text-foreground">{s.value}</span>
+                <span className="text-muted-foreground">{s.label}</span>
+              </span>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Stat cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        {cards.map((c) => (
-          <Card key={c.label}>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="grid h-12 w-12 place-items-center rounded-lg bg-secondary">
-                <c.icon className={`h-6 w-6 ${c.tone}`} />
-              </div>
-              <div>
-                <p className="font-heading text-3xl font-extrabold leading-none text-foreground">
-                  {c.value}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {c.label} <span className="text-xs">· {c.sub}</span>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick action */}
-      <Link href="/repetidas">
-        <Card className="transition-colors hover:border-primary/50">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
-              <Copy className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">Minhas repetidas</p>
-              <p className="text-sm text-muted-foreground">
-                Veja o que sobra e compartilhe para trocar
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-
       {/* Team progress */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle className="font-heading text-lg">Progresso por seleção</CardTitle>
-          <Link
-            href="/album"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Ver todas
-          </Link>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {topTeams.map((t) => (
