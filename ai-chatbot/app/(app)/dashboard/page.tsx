@@ -37,7 +37,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick actions: álbum + compartilhar perfil */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Link href="/album">
           <Card className="transition-colors hover:border-primary/50">
             <CardContent className="flex items-center gap-3 p-4">
