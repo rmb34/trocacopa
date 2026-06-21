@@ -14,7 +14,7 @@ export function ProductPreview() {
       {/* Copa accent stripe */}
       <div className="absolute -top-3 left-6 right-6 h-1.5 rounded-full bg-gradient-to-r from-success via-warn to-info" />
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
+      <div className="overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10">
         {/* Faux app bar */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-primary" />
@@ -25,7 +25,7 @@ export function ProductPreview() {
         </div>
 
         {/* Progress block */}
-        <div className="bg-gradient-to-br from-primary to-primary/80 px-4 py-4 text-primary-foreground">
+        <div className="bg-primary px-4 py-4 text-primary-foreground">
           <div className="flex items-baseline gap-2">
             <span className="font-heading text-4xl font-black leading-none">68%</span>
             <span className="text-sm text-primary-foreground/80">completo</span>
@@ -47,7 +47,7 @@ export function ProductPreview() {
                   'flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border ' +
                   (missing
                     ? 'border-dashed border-border bg-secondary/40'
-                    : 'border-border bg-background shadow-sm')
+                    : 'border-border bg-background ring-1 ring-foreground/5')
                 }
               >
                 <span className={missing ? 'opacity-30 grayscale' : ''}>

@@ -123,7 +123,7 @@ export default async function LandingPage() {
           </Link>
           <Link
             href="/sign-up"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             Criar conta
           </Link>
@@ -132,11 +132,6 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        {/* Themed glow */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
-        />
         <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-2 md:pt-16">
           {/* Copy */}
           <div className="text-center md:text-left">
@@ -146,11 +141,7 @@ export default async function LandingPage() {
             </div>
 
             <h1 className="mt-5 text-balance font-heading text-4xl font-black leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Seu álbum da{' '}
-              <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
-                Copa 2026
-              </span>{' '}
-              no bolso
+              Seu álbum da <span className="text-primary">Copa 2026</span> no bolso
             </h1>
 
             <p className="mx-auto mt-5 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground md:mx-0">
@@ -171,22 +162,18 @@ export default async function LandingPage() {
             <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:items-start">
               <Link
                 href="/sign-up"
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:w-auto"
               >
                 Montar meu álbum agora
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/sign-in"
-                className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary sm:w-auto"
+                className="flex w-full items-center justify-center rounded-lg border border-border px-6 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:w-auto"
               >
                 Já tenho conta
               </Link>
             </div>
-
-            <p className="mt-4 text-xs text-muted-foreground">
-              100% grátis · sem cartão · sem anúncios
-            </p>
           </div>
 
           {/* Product preview */}
@@ -203,15 +190,33 @@ export default async function LandingPage() {
             Tudo para completar seu álbum
           </h2>
           <p className="mx-auto mt-2 max-w-md text-center text-sm text-muted-foreground">
-            Rastreamento e trocas, tudo incluído — sem custo.
+            Rastreamento e trocas, tudo incluído.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="rounded-xl border border-border bg-card p-5 shadow-sm">
-                <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
-                  <f.icon className="h-5 w-5" />
+            {FEATURES.map((f, i) => (
+              <div
+                key={f.title}
+                className={
+                  'rounded-xl bg-card ring-1 ring-foreground/10 ' +
+                  (i === 0 ? 'p-6 sm:col-span-2 lg:col-span-2 lg:row-span-2' : 'p-5')
+                }
+              >
+                <div
+                  className={
+                    'grid place-items-center rounded-lg bg-primary/10 text-primary ' +
+                    (i === 0 ? 'h-12 w-12' : 'h-10 w-10')
+                  }
+                >
+                  <f.icon className={i === 0 ? 'h-6 w-6' : 'h-5 w-5'} />
                 </div>
-                <h3 className="mt-4 font-heading text-base font-bold text-foreground">{f.title}</h3>
+                <h3
+                  className={
+                    'mt-4 font-heading font-bold text-foreground ' +
+                    (i === 0 ? 'text-xl' : 'text-base')
+                  }
+                >
+                  {f.title}
+                </h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
               </div>
             ))}
@@ -219,36 +224,35 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing — 100% free */}
+      {/* Closing statement — it's free, no pricing-table theatrics */}
       <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="text-center font-heading text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
-          100% grátis, sem pegadinha.
-        </h2>
-        <div className="mx-auto mt-10 max-w-md">
-          <div className="relative flex flex-col rounded-2xl border-2 border-primary bg-card p-7 shadow-md">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">TrocaCopa</p>
-            <p className="mt-2 font-heading text-4xl font-black text-foreground">Grátis</p>
-            <p className="mt-1 text-sm text-muted-foreground">Para sempre</p>
-            <ul className="mt-6 flex flex-1 flex-col gap-3">
+        <div className="overflow-hidden rounded-2xl bg-primary px-6 py-10 text-primary-foreground sm:px-10 sm:py-14">
+          <div className="grid gap-8 md:grid-cols-2 md:items-center">
+            <div>
+              <h2 className="font-heading text-3xl font-black leading-tight sm:text-4xl">
+                É de graça. Sempre foi, sempre vai ser.
+              </h2>
+              <p className="mt-3 max-w-sm text-primary-foreground/85">
+                Sem anúncios, sem mensalidade, sem vender seus dados — e sem letra miúda.
+              </p>
+              <Link
+                href="/sign-up"
+                className="mt-7 inline-flex items-center justify-center gap-2 rounded-lg bg-primary-foreground px-6 py-3 text-base font-bold text-primary transition-colors hover:bg-primary-foreground/90 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                Criar conta e começar
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <ul className="flex flex-col gap-3">
               {FREE_INCLUDED.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
-                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
+                <li key={item} className="flex items-start gap-2.5 text-sm text-primary-foreground/95">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   {item}
                 </li>
               ))}
             </ul>
-            <Link
-              href="/sign-up"
-              className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-bold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Criar conta e começar
-              <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Sem anúncios · sem mensalidade · sem vender seus dados
-        </p>
       </section>
 
       <footer className="border-t border-border">
