@@ -1,26 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTheme } from 'next-themes'
 import { Moon, Sun } from 'lucide-react'
 
-// Shared dark-mode state: reads stored preference / system default on mount,
-// toggles the `dark` class on <html> and persists the choice.
+// Thin wrapper over next-themes: exposes the resolved dark state (false until
+// mounted, so server and first client render always agree) and a toggle that
+// pins an explicit light/dark choice.
 export function useDarkMode() {
-  const [dark, setDark] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    const stored = localStorage.getItem('theme')
-    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
-      setDark(true)
-    }
-  }, [])
+  useEffect(() => setMounted(true), [])
+
+  const dark = mounted && resolvedTheme === 'dark'
 
   function toggle() {
-    const next = !dark
-    setDark(next)
-    document.documentElement.classList.toggle('dark', next)
-    localStorage.setItem('theme', next ? 'dark' : 'light')
+    setTheme(dark ? 'light' : 'dark')
   }
 
   return { dark, toggle }
