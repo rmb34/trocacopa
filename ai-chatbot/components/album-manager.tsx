@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useTransition } from 'react'
-import { TEAMS, GROUPS, type Team } from '@/lib/catalog'
+import { TEAMS, GROUPS, searchTeams, type Team } from '@/lib/catalog'
 import { TeamFlag } from '@/components/team-flag'
 import { adjustStickerCount, setManyCounts } from '@/app/actions/stickers'
 import { computeStats, type EntryMap } from '@/lib/stats'
@@ -23,6 +23,7 @@ export function AlbumManager({
   const [entries, setEntries] = useState<EntryMap>(initialEntries)
   const [group, setGroup] = useState<string>(GROUPS[0])
   const [filter, setFilter] = useState<Filter>('all')
+  const [search, setSearch] = useState('')
   const [visibleCount, setVisibleCount] = useState(10)
   const [, startTransition] = useTransition()
 
@@ -33,13 +34,15 @@ export function AlbumManager({
   )
 
   // Reset pagination when the visible set changes
-  useEffect(() => { setVisibleCount(10) }, [group, filter])
+  useEffect(() => { setVisibleCount(10) }, [group, filter, search])
+
+  const searchedTeams = useMemo(() => searchTeams(teamsInGroup, search), [teamsInGroup, search])
 
   // With a state filter active, teams without any matching sticker are pure
   // noise — drop them entirely instead of rendering empty cards.
   const matchingTeams = useMemo(() => {
-    if (filter === 'all') return teamsInGroup
-    return teamsInGroup.filter((team) => {
+    if (filter === 'all') return searchedTeams
+    return searchedTeams.filter((team) => {
       for (let n = 1; n <= team.stickerCount; n++) {
         const c = entries[`${team.code}-${n}`] ?? 0
         if (filter === 'missing' ? c === 0 : filter === 'owned' ? c >= 1 : c > 1) {
@@ -48,7 +51,7 @@ export function AlbumManager({
       }
       return false
     })
-  }, [teamsInGroup, filter, entries])
+  }, [searchedTeams, filter, entries])
 
   const visibleTeams = useMemo(
     () => group === 'Todas' ? matchingTeams.slice(0, visibleCount) : matchingTeams,
@@ -182,6 +185,15 @@ export function AlbumManager({
         ))}
       </div>
 
+      {/* Team search */}
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar time por nome ou sigla (ex.: Brasil ou BRA)"
+        className="h-10 rounded-md border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+      />
+
       {/* Filter chips */}
       <div className="flex flex-wrap gap-2">
         {filters.map((f) => (
@@ -204,11 +216,13 @@ export function AlbumManager({
       <div className="flex flex-col gap-5">
         {matchingTeams.length === 0 && (
           <Card className="p-8 text-center text-sm text-muted-foreground">
-            {filter === 'duplicates'
-              ? 'Nenhuma repetida por aqui ainda.'
-              : filter === 'missing'
-                ? 'Nada faltando por aqui — tudo colado!'
-                : 'Nenhuma figurinha colada ainda nesse grupo.'}
+            {search
+              ? 'Nenhum time encontrado com essa busca.'
+              : filter === 'duplicates'
+                ? 'Nenhuma repetida por aqui ainda.'
+                : filter === 'missing'
+                  ? 'Nada faltando por aqui — tudo colado!'
+                  : 'Nenhuma figurinha colada ainda nesse grupo.'}
           </Card>
         )}
         {visibleTeams.map((team) => {

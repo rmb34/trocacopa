@@ -118,3 +118,21 @@ export function stickerLabel(code: string) {
   if (!parsed) return code
   return `${parsed.teamCode} ${parsed.n}`
 }
+
+// Diacritic-insensitive, case-insensitive comparison — "brasil" e "Brasil" e
+// "índia" e "india" devem casar do mesmo jeito na busca do álbum.
+export function normalizeSearch(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+}
+
+export function searchTeams(teams: Team[], query: string): Team[] {
+  const normalized = normalizeSearch(query)
+  if (!normalized) return teams
+  return teams.filter(
+    (team) => normalizeSearch(team.name).includes(normalized) || normalizeSearch(team.code).includes(normalized),
+  )
+}

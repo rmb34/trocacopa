@@ -9,6 +9,8 @@ import {
   stickerCode,
   teamByCode,
   stickerLabel,
+  normalizeSearch,
+  searchTeams,
 } from '@/lib/catalog'
 
 describe('catalog — integridade dos dados', () => {
@@ -122,5 +124,52 @@ describe('stickerLabel', () => {
 
   it('retorna o código original se inválido', () => {
     expect(stickerLabel('INVALIDO')).toBe('INVALIDO')
+  })
+})
+
+describe('normalizeSearch', () => {
+  it('ignora maiúsculas/minúsculas', () => {
+    expect(normalizeSearch('Brasil')).toBe(normalizeSearch('brasil'))
+  })
+
+  it('ignora acentos', () => {
+    expect(normalizeSearch('México')).toBe(normalizeSearch('Mexico'))
+    expect(normalizeSearch('África do Sul')).toBe(normalizeSearch('Africa do Sul'))
+  })
+
+  it('remove espaços nas pontas', () => {
+    expect(normalizeSearch('  Brasil  ')).toBe('brasil')
+  })
+})
+
+describe('searchTeams', () => {
+  it('sem query, retorna a lista original', () => {
+    expect(searchTeams(TEAMS, '')).toBe(TEAMS)
+    expect(searchTeams(TEAMS, '   ')).toBe(TEAMS)
+  })
+
+  it('encontra por nome completo ou parcial, sem diferenciar caixa', () => {
+    expect(searchTeams(TEAMS, 'brasil').map((t) => t.code)).toEqual(['BRA'])
+    expect(searchTeams(TEAMS, 'BRASIL').map((t) => t.code)).toEqual(['BRA'])
+    expect(searchTeams(TEAMS, 'bras').map((t) => t.code)).toEqual(['BRA'])
+  })
+
+  it('encontra por nome ignorando acentuação', () => {
+    expect(searchTeams(TEAMS, 'mexico').map((t) => t.code)).toEqual(['MEX'])
+    expect(searchTeams(TEAMS, 'africa').map((t) => t.code)).toEqual(['RSA'])
+  })
+
+  it('encontra pela sigla oficial do álbum', () => {
+    expect(searchTeams(TEAMS, 'BRA').map((t) => t.code)).toEqual(['BRA'])
+    expect(searchTeams(TEAMS, 'ger').map((t) => t.code)).toEqual(['GER'])
+  })
+
+  it('retorna lista vazia quando nada casa', () => {
+    expect(searchTeams(TEAMS, 'zzz-nao-existe')).toEqual([])
+  })
+
+  it('opera sobre a lista passada, não sempre sobre TEAMS inteiro', () => {
+    const groupA = TEAMS.filter((t) => t.group === 'A')
+    expect(searchTeams(groupA, 'BRA')).toEqual([])
   })
 })
