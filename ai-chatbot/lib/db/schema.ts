@@ -63,6 +63,9 @@ export const profile = pgTable('profile', {
   slug: text('slug').notNull().unique(),
   city: text('city'),
   whatsapp: text('whatsapp'),
+  // Opt-in: show a WhatsApp contact button on the public page. The number
+  // itself stays private unless this is true.
+  showWhatsapp: boolean('showWhatsapp').notNull().default(false),
   isPublic: boolean('isPublic').notNull().default(true),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),

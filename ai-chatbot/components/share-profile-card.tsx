@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Share2, Check } from 'lucide-react'
 import { publishProfile } from '@/app/actions/profile'
+import { shareContent } from '@/lib/share'
 import { toast } from 'sonner'
 
 export function ShareProfileCard({
@@ -17,14 +18,31 @@ export function ShareProfileCard({
   const [isPublicState, setIsPublicState] = useState(isPublic)
 
   async function handleClick() {
-    const result = await publishProfile()
-    const url = `${window.location.origin}/u/${result.slug}`
+    const url = `${window.location.origin}/u/${slug}`
+    try {
+      // Share and publish in parallel: the share sheet must open inside the
+      // tap's user activation, which an awaited server action would consume.
+      const [shared, published] = await Promise.all([
+        shareContent({
+          text: 'Meu álbum da Copa 2026 no TrocaCopa — bora trocar figurinhas?',
+          url,
+        }),
+        publishProfile(),
+      ])
 
-    await navigator.clipboard.writeText(url)
-    setCopied(true)
-    setIsPublicState(true)
-    toast.success(result.activated ? 'Perfil ativado e link copiado!' : 'Link copiado!')
-    setTimeout(() => setCopied(false), 2000)
+      setIsPublicState(true)
+      if (published.activated) toast.success('Perfil público ativado!')
+
+      if (shared === 'copied') {
+        setCopied(true)
+        toast.success('Link copiado!')
+        setTimeout(() => setCopied(false), 2000)
+      } else if (shared === 'failed') {
+        toast.error('Não foi possível compartilhar o link. Tente de novo.')
+      }
+    } catch {
+      toast.error('Não foi possível ativar seu link público. Tente de novo.')
+    }
   }
 
   return (

@@ -16,6 +16,7 @@ type ProfileData = {
   city: string | null
   whatsapp: string | null
   isPublic: boolean
+  showWhatsapp: boolean
   slug: string
 }
 
@@ -24,6 +25,7 @@ export function ProfileForm({ profile }: { profile: ProfileData }) {
   const [city, setCity] = useState(profile.city ?? '')
   const [whatsapp, setWhatsapp] = useState(profile.whatsapp ?? '')
   const [isPublic, setIsPublic] = useState(profile.isPublic)
+  const [showWhatsapp, setShowWhatsapp] = useState(profile.showWhatsapp)
   const [publicUrl, setPublicUrl] = useState(`/u/${profile.slug}`)
   const [isPending, startTransition] = useTransition()
 
@@ -35,7 +37,7 @@ export function ProfileForm({ profile }: { profile: ProfileData }) {
     e.preventDefault()
     startTransition(async () => {
       try {
-        await updateProfile({ displayName, city, whatsapp, isPublic })
+        await updateProfile({ displayName, city, whatsapp, isPublic, showWhatsapp })
         toast.success('Perfil atualizado!')
       } catch {
         toast.error('Não foi possível salvar. Tente de novo.')
@@ -63,10 +65,11 @@ export function ProfileForm({ profile }: { profile: ProfileData }) {
             {publicUrl}
           </code>
           <ShareButton
-            text={publicUrl}
+            url={publicUrl}
             label="Copiar"
             labelCopied="Copiado!"
             variant="outline"
+            mode="copy"
           />
         </CardContent>
       </Card>
@@ -107,8 +110,27 @@ export function ProfileForm({ profile }: { profile: ProfileData }) {
                 inputMode="numeric"
               />
               <p className="text-xs text-muted-foreground">
-                Só números com DDD. Guardado em privado — não aparece no seu perfil público.
+                Só números com DDD. O número nunca aparece escrito no seu perfil —
+                no máximo vira um botão de conversa, se você ativar abaixo.
               </p>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border p-4">
+              <div className="flex-1 pr-4">
+                <Label htmlFor="showWhatsapp" className="cursor-pointer font-medium">
+                  Botão de WhatsApp no perfil público
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Quem visitar seu perfil vê um botão &quot;Chamar no WhatsApp&quot; para
+                  combinar trocas com você
+                </p>
+              </div>
+              <Switch
+                id="showWhatsapp"
+                checked={showWhatsapp && whatsapp.length > 0}
+                disabled={whatsapp.length === 0}
+                onCheckedChange={setShowWhatsapp}
+              />
             </div>
 
             <div className="flex items-center justify-between rounded-lg border border-border p-4">
