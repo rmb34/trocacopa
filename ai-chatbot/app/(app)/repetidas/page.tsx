@@ -4,8 +4,12 @@ import { getMyEntries } from '@/app/actions/stickers'
 import { TEAMS } from '@/lib/catalog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
 import { ShareButton } from '@/components/share-button'
 import { TeamFlag } from '@/components/team-flag'
+import { whatsappShareUrl } from '@/lib/share'
+import { cn } from '@/lib/utils'
+import { MessageCircle } from 'lucide-react'
 
 export default async function ReptidasPage() {
   const profile = await getOrCreateProfile()
@@ -49,7 +53,18 @@ export default async function ReptidasPage() {
           </p>
         </div>
         {teamDuplicates.length > 0 && (
-          <ShareButton text={shareText} label="Compartilhar lista" />
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={whatsappShareUrl(shareText)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(buttonVariants(), 'gap-2')}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Enviar no WhatsApp
+            </a>
+            <ShareButton text={shareText} label="Compartilhar" />
+          </div>
         )}
       </div>
 

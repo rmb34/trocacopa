@@ -9,6 +9,10 @@ import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/logo'
 import { ShareButton } from '@/components/share-button'
 import { TeamFlag } from '@/components/team-flag'
+import { buttonVariants } from '@/components/ui/button'
+import { whatsappChatUrl } from '@/lib/share'
+import { cn } from '@/lib/utils'
+import { ArrowRight, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -64,7 +68,7 @@ export default async function PublicProfilePage({ params }: Props) {
             <Logo />
           </Link>
           <ShareButton
-            text={publicUrl}
+            url={publicUrl}
             label="Compartilhar"
             labelCopied="Link copiado!"
           />
@@ -80,6 +84,20 @@ export default async function PublicProfilePage({ params }: Props) {
           </div>
           {profile.city && (
             <p className="mt-1 text-sm text-muted-foreground">{profile.city}</p>
+          )}
+          {profile.whatsapp && (
+            <a
+              href={whatsappChatUrl(
+                profile.whatsapp,
+                `Oi, ${profile.displayName.split(' ')[0]}! Vi seu álbum no TrocaCopa e quero combinar uma troca de figurinhas.`,
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(buttonVariants(), 'mt-3 gap-2')}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Chamar no WhatsApp
+            </a>
           )}
         </div>
 
@@ -150,6 +168,24 @@ export default async function PublicProfilePage({ params }: Props) {
             )}
           </section>
         </div>
+
+        {/* Visitor CTA — this page is how new collectors discover the app */}
+        <Card className="mt-8">
+          <CardContent className="flex flex-col items-center gap-3 p-6 text-center sm:flex-row sm:justify-between sm:text-left">
+            <div>
+              <p className="font-heading text-lg font-bold text-foreground">
+                Monte o seu álbum também
+              </p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                Controle figurinhas, repetidas e trocas. 100% grátis.
+              </p>
+            </div>
+            <Link href="/sign-up" className={cn(buttonVariants(), 'shrink-0 gap-2')}>
+              Criar meu álbum
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
