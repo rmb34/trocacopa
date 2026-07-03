@@ -79,14 +79,18 @@ export async function updateProfile(input: {
   city: string
   whatsapp: string
   isPublic: boolean
+  showWhatsapp: boolean
 }) {
   const userId = await getUserId()
+  const whatsapp = input.whatsapp.replace(/\D/g, '').slice(0, 15) || null
   await db
     .update(profile)
     .set({
       displayName: input.displayName.trim().slice(0, 60) || 'Colecionador',
       city: input.city.trim().slice(0, 80) || null,
-      whatsapp: input.whatsapp.replace(/\D/g, '').slice(0, 15) || null,
+      whatsapp,
+      // Never leave the opt-in on without a number behind it.
+      showWhatsapp: input.showWhatsapp && whatsapp !== null,
       isPublic: input.isPublic,
       updatedAt: new Date(),
     })

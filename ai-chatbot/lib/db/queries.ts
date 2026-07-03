@@ -8,7 +8,8 @@ import { eq } from 'drizzle-orm'
 import { toEntryMap, type EntryMap } from '@/lib/stats'
 
 export async function getProfileBySlug(slug: string) {
-  // Explicit select — never expose `whatsapp` on the public payload.
+  // Explicit select — `whatsapp` only leaves the server when the owner
+  // explicitly opted in via `showWhatsapp`.
   const rows = await db
     .select({
       userId: profile.userId,
@@ -16,11 +17,15 @@ export async function getProfileBySlug(slug: string) {
       slug: profile.slug,
       city: profile.city,
       isPublic: profile.isPublic,
+      whatsapp: profile.whatsapp,
+      showWhatsapp: profile.showWhatsapp,
     })
     .from(profile)
     .where(eq(profile.slug, slug))
     .limit(1)
-  return rows[0] ?? null
+  const row = rows[0]
+  if (!row) return null
+  return { ...row, whatsapp: row.showWhatsapp ? row.whatsapp : null }
 }
 
 export async function getEntriesByUserId(userId: string): Promise<EntryMap> {
