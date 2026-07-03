@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { TEAMS, GROUPS, type Team } from '@/lib/catalog'
 import { TeamFlag } from '@/components/team-flag'
-import { adjustStickerCount, setManyCounts, setStickerCount } from '@/app/actions/stickers'
+import { adjustStickerCount, setManyCounts } from '@/app/actions/stickers'
 import { computeStats, type EntryMap } from '@/lib/stats'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -32,20 +32,37 @@ export function AlbumManager({
     [group],
   )
 
-  // Reset pagination when group changes
-  useEffect(() => { setVisibleCount(10) }, [group])
+  // Reset pagination when the visible set changes
+  useEffect(() => { setVisibleCount(10) }, [group, filter])
+
+  // With a state filter active, teams without any matching sticker are pure
+  // noise — drop them entirely instead of rendering empty cards.
+  const matchingTeams = useMemo(() => {
+    if (filter === 'all') return teamsInGroup
+    return teamsInGroup.filter((team) => {
+      for (let n = 1; n <= team.stickerCount; n++) {
+        const c = entries[`${team.code}-${n}`] ?? 0
+        if (filter === 'missing' ? c === 0 : filter === 'owned' ? c >= 1 : c > 1) {
+          return true
+        }
+      }
+      return false
+    })
+  }, [teamsInGroup, filter, entries])
 
   const visibleTeams = useMemo(
-    () => group === 'Todas' ? teamsInGroup.slice(0, visibleCount) : teamsInGroup,
-    [teamsInGroup, group, visibleCount],
+    () => group === 'Todas' ? matchingTeams.slice(0, visibleCount) : matchingTeams,
+    [matchingTeams, group, visibleCount],
   )
-  const hasMore = group === 'Todas' && visibleCount < teamsInGroup.length
+  const hasMore = group === 'Todas' && visibleCount < matchingTeams.length
 
   function countFor(code: string) {
     return entries[code] ?? 0
   }
 
-  // Optimistic update with server persistence.
+  // Optimistic update with server persistence. Every gesture in the grid
+  // moves the count by exactly one, so no tap can wipe a pile of duplicates
+  // at once — losing a sticker is always a single tap away from recovery.
   function adjust(code: string, delta: number) {
     const current = countFor(code)
     const next = Math.max(0, Math.min(99, current + delta))
@@ -54,29 +71,10 @@ export function AlbumManager({
     startTransition(async () => {
       try {
         await adjustStickerCount(code, delta)
-        // Wiping more than one copy at once is the highest-anxiety action in
-        // the album (real duplicates in hand, gone with one tap) — always
-        // offer a way back.
-        if (current > 1 && next === 0) {
-          toast(`Removeu ${current} cópias de ${code}.`, {
-            action: { label: 'Desfazer', onClick: () => restoreCount(code, current) },
-          })
-        }
       } catch {
         // revert on failure
         setEntries((prev) => ({ ...prev, [code]: current }))
         toast.error('Não foi possível salvar. Tente de novo.')
-      }
-    })
-  }
-
-  function restoreCount(code: string, count: number) {
-    setEntries((prev) => ({ ...prev, [code]: count }))
-    startTransition(async () => {
-      try {
-        await setStickerCount(code, count)
-      } catch {
-        toast.error('Não foi possível desfazer. Tente de novo.')
       }
     })
   }
@@ -134,7 +132,7 @@ export function AlbumManager({
             Meu álbum
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Toque para colar uma figurinha. Use + para registrar repetidas.
+            Toque para colar ou tirar uma figurinha. Use + e − para as repetidas.
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm">
@@ -204,6 +202,15 @@ export function AlbumManager({
 
       {/* Teams */}
       <div className="flex flex-col gap-5">
+        {matchingTeams.length === 0 && (
+          <Card className="p-8 text-center text-sm text-muted-foreground">
+            {filter === 'duplicates'
+              ? 'Nenhuma repetida por aqui ainda.'
+              : filter === 'missing'
+                ? 'Nada faltando por aqui — tudo colado!'
+                : 'Nenhuma figurinha colada ainda nesse grupo.'}
+          </Card>
+        )}
         {visibleTeams.map((team) => {
           const nums = visibleNumbers(team)
           let owned = 0
@@ -242,29 +249,23 @@ export function AlbumManager({
                 </Button>
               </div>
 
-              {nums.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  Nenhuma figurinha nesse filtro.
-                </p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-9">
-                  {nums.map((n) => {
-                    const code = `${team.code}-${n}`
-                    const count = countFor(code)
-                    return (
-                      <StickerCell
-                        key={code}
-                        teamCode={team.code}
-                        n={n}
-                        count={count}
-                        onToggle={() => adjust(code, count >= 1 ? -count : 1)}
-                        onInc={() => adjust(code, 1)}
-                        onDec={() => adjust(code, -1)}
-                      />
-                    )
-                  })}
-                </div>
-              )}
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-9">
+                {nums.map((n) => {
+                  const code = `${team.code}-${n}`
+                  const count = countFor(code)
+                  return (
+                    <StickerCell
+                      key={code}
+                      teamCode={team.code}
+                      n={n}
+                      count={count}
+                      onToggle={() => adjust(code, count >= 1 ? -1 : 1)}
+                      onInc={() => adjust(code, 1)}
+                      onDec={() => adjust(code, -1)}
+                    />
+                  )
+                })}
+              </div>
             </Card>
           )
         })}
@@ -275,7 +276,7 @@ export function AlbumManager({
             className="w-full"
             onClick={() => setVisibleCount((c) => c + 10)}
           >
-            Ver mais {Math.min(10, teamsInGroup.length - visibleCount)} seleções
+            Ver mais {Math.min(10, matchingTeams.length - visibleCount)} seleções
           </Button>
         )}
       </div>
@@ -314,9 +315,13 @@ function StickerCell({
     >
       <button
         onClick={onToggle}
-        className="flex w-full flex-col items-center"
+        className="flex w-full touch-manipulation flex-col items-center"
         aria-label={
-          owned ? `Remover figurinha ${teamCode} ${n}` : `Colar figurinha ${teamCode} ${n}`
+          duplicate
+            ? `Tirar uma cópia de ${teamCode} ${n}`
+            : owned
+              ? `Descolar figurinha ${teamCode} ${n}`
+              : `Colar figurinha ${teamCode} ${n}`
         }
       >
         <span className="font-mono text-[10px] uppercase text-muted-foreground">
@@ -337,14 +342,14 @@ function StickerCell({
         <div className="mt-2 flex items-center gap-1">
           <button
             onClick={onDec}
-            className="grid h-5 w-5 place-items-center rounded bg-background text-foreground ring-1 ring-foreground/10 hover:bg-secondary"
+            className="grid h-7 w-7 touch-manipulation place-items-center rounded-md bg-background text-foreground ring-1 ring-foreground/10 hover:bg-secondary"
             aria-label={`Diminuir ${teamCode} ${n}`}
           >
-            <Minus className="h-3 w-3" />
+            <Minus className="h-3.5 w-3.5" />
           </button>
           <span
             className={cn(
-              'min-w-5 rounded px-1 text-center text-xs font-bold',
+              'min-w-6 rounded px-1 text-center text-xs font-bold',
               duplicate ? 'text-accent-foreground' : 'text-muted-foreground',
             )}
           >
@@ -352,19 +357,19 @@ function StickerCell({
           </span>
           <button
             onClick={onInc}
-            className="grid h-5 w-5 place-items-center rounded bg-background text-foreground ring-1 ring-foreground/10 hover:bg-secondary"
+            className="grid h-7 w-7 touch-manipulation place-items-center rounded-md bg-background text-foreground ring-1 ring-foreground/10 hover:bg-secondary"
             aria-label={`Aumentar ${teamCode} ${n}`}
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : (
         <button
           onClick={onInc}
-          className="mt-2 flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground hover:text-primary"
+          className="mt-2 flex h-7 touch-manipulation items-center gap-0.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:text-primary"
           aria-label={`Adicionar ${teamCode} ${n}`}
         >
-          <Plus className="h-3 w-3" /> tenho
+          <Plus className="h-3.5 w-3.5" /> tenho
         </button>
       )}
 
