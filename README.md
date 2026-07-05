@@ -83,6 +83,8 @@ The visual identity (Brazilian flag palette) is defined entirely as semantic `ok
 - **No read IDOR:** data reads are server-only functions, not exposed actions.
 - **No PII leakage:** email is never sent to public pages.
 - **Input hardening:** sticker codes are validated against the catalog and counts are clamped server-side.
+- **Rate limiting:** mutating actions are rate-limited per user (in-memory, per instance).
+- **Security headers:** CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`.
 
 ---
 
@@ -101,7 +103,6 @@ npm test
 
 ## Roadmap
 
-- **Rate limiting** on mutating actions before scaling traffic.
 - **Custom domain** and a per-profile Open Graph image for richer link previews.
 - **Trade matching** — surface collectors whose duplicates fill your gaps (and vice-versa).
 - Revisit "public by default" with an explicit share-to-publish flow.
