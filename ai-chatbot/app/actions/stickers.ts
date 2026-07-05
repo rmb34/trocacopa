@@ -6,6 +6,7 @@ import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { allStickerCodes } from '@/lib/catalog'
 import { toEntryMap, type EntryMap } from '@/lib/stats'
+import { assertStickerRateLimit } from '@/lib/rate-limit'
 import { getUserId } from './profile'
 
 const VALID_CODES = new Set(allStickerCodes())
@@ -22,6 +23,7 @@ export async function getMyEntries(): Promise<EntryMap> {
 // Upsert a single sticker's count. count is clamped to >= 0.
 export async function setStickerCount(stickerCode: string, count: number) {
   const userId = await getUserId()
+  assertStickerRateLimit(userId)
   if (!VALID_CODES.has(stickerCode)) throw new Error('Figurinha inválida')
   const safe = Math.max(0, Math.min(99, Math.floor(count)))
 
@@ -42,6 +44,7 @@ export async function setStickerCount(stickerCode: string, count: number) {
 // Adjust a sticker's count by a delta (e.g. +1 / -1 buttons).
 export async function adjustStickerCount(stickerCode: string, delta: number) {
   const userId = await getUserId()
+  assertStickerRateLimit(userId)
   if (!VALID_CODES.has(stickerCode)) throw new Error('Figurinha inválida')
 
   const existing = await db
@@ -70,6 +73,7 @@ export async function adjustStickerCount(stickerCode: string, delta: number) {
 // Bulk set many codes at once (used by "marcar time inteiro").
 export async function setManyCounts(updates: { stickerCode: string; count: number }[]) {
   const userId = await getUserId()
+  assertStickerRateLimit(userId)
   const valid = updates.filter((u) => VALID_CODES.has(u.stickerCode))
   for (const u of valid) {
     const safe = Math.max(0, Math.min(99, Math.floor(u.count)))

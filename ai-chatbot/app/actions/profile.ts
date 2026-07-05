@@ -6,6 +6,7 @@ import { profile } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { assertProfileRateLimit } from '@/lib/rate-limit'
 
 export async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -82,6 +83,7 @@ export async function updateProfile(input: {
   showWhatsapp: boolean
 }) {
   const userId = await getUserId()
+  assertProfileRateLimit(userId)
   const whatsapp = input.whatsapp.replace(/\D/g, '').slice(0, 15) || null
   await db
     .update(profile)
@@ -102,6 +104,7 @@ export async function updateProfile(input: {
 
 export async function publishProfile() {
   const userId = await getUserId()
+  assertProfileRateLimit(userId)
 
   const [activated] = await db
     .update(profile)
