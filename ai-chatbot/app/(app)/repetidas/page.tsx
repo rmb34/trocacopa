@@ -11,7 +11,7 @@ import { whatsappShareUrl } from '@/lib/share'
 import { cn } from '@/lib/utils'
 import { MessageCircle } from 'lucide-react'
 
-export default async function ReptidasPage() {
+export default async function RepetidasPage() {
   const profile = await getOrCreateProfile()
   if (!profile) redirect('/sign-in')
 
