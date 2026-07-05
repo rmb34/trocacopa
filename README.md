@@ -14,8 +14,6 @@ Every World Cup, millions of people fill a physical sticker album and end up wit
 
 The whole product is **free**: album tracking, duplicate management, and a public collector profile designed so every shared link is organic acquisition.
 
-> 📂 This repository contains the full source. The app lives under [`ai-chatbot/`](./ai-chatbot).
-
 ---
 
 ## What It Does
@@ -50,6 +48,18 @@ Browser ──▶ Next.js App Router (Server Components, SSR)
 
 Reads and writes are deliberately split: mutations are Server Actions that derive the user id from the session, while reads live in a server-only query module that is never exposed as an endpoint. The UI only renders what the server decided to send.
 
+### Routes
+
+```
+/                    Public landing
+/sign-in, /sign-up   Auth
+/dashboard           Collector dashboard
+/album               Full album with group/status filters
+/repetidas           Duplicates list
+/perfil              Profile editing
+/u/[slug]            Public profile (no authentication)
+```
+
 ---
 
 ## Tech Stack
@@ -60,8 +70,8 @@ Reads and writes are deliberately split: mutations are Server Actions that deriv
 | Styling | Tailwind CSS v4, shadcn/ui, oklch design tokens |
 | Auth | better-auth (session-based) |
 | Database | PostgreSQL (Neon — serverless) |
-| ORM | Drizzle ORM |
-| PWA | Web manifest + generated icons |
+| ORM | Drizzle ORM + drizzle-kit |
+| PWA | @ducanh2912/next-pwa |
 | Testing | Vitest |
 | Deploy | Vercel |
 
@@ -88,12 +98,53 @@ The visual identity (Brazilian flag palette) is defined entirely as semantic `ok
 
 ---
 
+## Running Locally
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment variables
+cp .env.example .env.local   # edit with your real values
+
+# 3. Push the schema to your database
+npx drizzle-kit push
+
+# 4. Start the dev server
+npm run dev
+```
+
+The app runs at [http://localhost:3000](http://localhost:3000).
+
+### Environment variables
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | Neon (PostgreSQL) connection string |
+| `BETTER_AUTH_SECRET` | Long random string (32+ chars) |
+| `BETTER_AUTH_URL` | Public app URL (local: `http://localhost:3000`) |
+
+### Database
+
+The schema in [`lib/db/schema.ts`](./lib/db/schema.ts) is the source of truth, synced with `drizzle-kit push` (no versioned migration files):
+
+```
+user / session / account / verification   — better-auth tables
+profile        — public collector profile (1:1 with user)
+sticker_entry  — user's stickers (userId, stickerCode, count)
+```
+
+`sticker_entry` has a unique constraint on `(userId, stickerCode)`, required by the album's optimistic upsert.
+
+---
+
 ## Testing
 
 Vitest, with coverage focused on the logic that matters:
 
 - **Catalog integrity** — 993 stickers across 50 sets, groups A–L + Especial.
 - **Statistics** — completion, per-team progress, missing/duplicate computation.
+- **Rate limiting** — window, blocking, expiry, and per-user isolation.
 
 ```bash
 npm test
@@ -106,18 +157,6 @@ npm test
 - **Custom domain** and a per-profile Open Graph image for richer link previews.
 - **Trade matching** — surface collectors whose duplicates fill your gaps (and vice-versa).
 - Revisit "public by default" with an explicit share-to-publish flow.
-
----
-
-## Running Locally
-
-The application source is in [`ai-chatbot/`](./ai-chatbot), with full setup, environment variables, and database instructions in its [README](./ai-chatbot/README.md).
-
-```bash
-cd ai-chatbot
-npm install
-npm run dev
-```
 
 ---
 
