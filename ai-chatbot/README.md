@@ -63,16 +63,16 @@ BETTER_AUTH_URL=https://seu-dominio.vercel.app
 
 ```bash
 # 1. Instalar dependências
-pnpm install
+npm install
 
 # 2. Configurar variáveis de ambiente
 cp .env.example .env.local  # edite com seus valores reais
 
 # 3. Aplicar schema no banco
-pnpm drizzle-kit push
+npx drizzle-kit push
 
 # 4. Iniciar servidor de desenvolvimento
-pnpm dev
+npm run dev
 ```
 
 O servidor sobe em [http://localhost:3000](http://localhost:3000).
@@ -81,10 +81,10 @@ O servidor sobe em [http://localhost:3000](http://localhost:3000).
 
 ```bash
 # Rodar todos os testes
-pnpm test
+npm test
 
 # Modo watch
-pnpm test:watch
+npm run test:watch
 ```
 
 Os testes cobrem integridade do catálogo (993 figurinhas, 50 seleções, grupos A–L + Especial), todas as funções de estatística e isolamento multi-tenant.
@@ -94,7 +94,7 @@ Os testes cobrem integridade do catálogo (993 figurinhas, 50 seleções, grupos
 O projeto usa `drizzle-kit push` para sincronizar o schema diretamente com o banco. Não há arquivos de migration versionados — o schema em `lib/db/schema.ts` é a fonte da verdade.
 
 ```bash
-DATABASE_URL=<sua-url> pnpm drizzle-kit push
+DATABASE_URL=<sua-url> npx drizzle-kit push
 ```
 
 ## Deploy (Vercel)
