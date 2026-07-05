@@ -8,7 +8,7 @@ import { ProductPreview } from '@/components/landing/product-preview'
 import { TOTAL_STICKERS } from '@/lib/catalog'
 import { BookOpen, Copy, Users, Check, ArrowRight, Smartphone, Trophy } from 'lucide-react'
 
-const SITE_URL = process.env.BETTER_AUTH_URL ?? 'https://ai-chatbot-beta-plum.vercel.app'
+const SITE_URL = process.env.BETTER_AUTH_URL ?? 'https://troca-copa-26.vercel.app'
 
 export const metadata: Metadata = {
   title: 'TrocaCopa — Álbum de figurinhas da Copa 2026 no celular',

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const SITE_URL = process.env.BETTER_AUTH_URL ?? 'https://ai-chatbot-beta-plum.vercel.app'
+const SITE_URL = process.env.BETTER_AUTH_URL ?? 'https://troca-copa-26.vercel.app'
 
 export default function robots(): MetadataRoute.Robots {
   return {

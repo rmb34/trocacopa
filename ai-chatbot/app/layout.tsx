@@ -18,7 +18,7 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.BETTER_AUTH_URL ?? 'https://ai-chatbot-beta-plum.vercel.app',
+    process.env.BETTER_AUTH_URL ?? 'https://troca-copa-26.vercel.app',
   ),
   title: {
     default: 'TrocaCopa — Álbum de figurinhas da Copa 2026 no celular',
